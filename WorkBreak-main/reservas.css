@@ -1,0 +1,213 @@
+/*========================================
+=            Estilo general Navbar        =
+========================================*/
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  font-family: 'Roboto', sans-serif;
+  position: relative;
+  z-index: 10;
+}
+
+/*----------------------------------------
+  Logo
+----------------------------------------*/
+.navbar .logo {
+  display: flex;
+  align-items: center;
+  font-size: 1.5rem;
+  color: #ff385c; /* Airbnb pink */
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  gap: 8px;
+}
+
+.navbar .logo i {
+  font-size: 1.8rem;
+}
+
+/*----------------------------------------
+  Barra de búsqueda
+----------------------------------------*/
+.navbar .search-bar {
+  flex: 1;
+  max-width: 400px;
+  margin: 0 20px;
+  position: relative;
+}
+
+.navbar .search-bar input {
+  width: 100%;
+  padding: 8px 40px 8px 15px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  font-size: 1rem;
+  transition: box-shadow 0.3s ease;
+}
+
+.navbar .search-bar input:focus {
+  outline: none;
+  box-shadow: 0 0 8px rgba(255, 56, 92, 0.5);
+  border-color: #ff385c;
+}
+
+.navbar .search-bar i {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ff385c;
+  font-size: 1.2rem;
+  pointer-events: none;
+}
+
+/*----------------------------------------
+  Menú de usuario
+----------------------------------------*/
+.navbar .user-menu {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 1.4rem;
+  color: #555;
+  cursor: pointer;
+}
+
+.navbar .user-menu i:hover {
+  color: #ff385c;
+  transition: color 0.3s ease;
+}
+
+/*========================================
+=            Título centrado             =
+========================================*/
+.location-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: #333;
+  user-select: none;
+  pointer-events: none;
+  font-family: 'Roboto', sans-serif;
+}
+
+
+/*========================================
+=            Estilo del carrusel          =
+========================================*/
+.gallery-carousel {
+  max-width: 900px;
+  margin: 40px auto;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--airbnb-gray);
+  background: #fff;
+  position: relative;
+  font-family: 'Roboto', sans-serif;
+}
+
+/*----------------------------------------
+  Imagenes del carrusel
+----------------------------------------*/
+.gallery-carousel .carousel-inner img {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+  border-radius: 16px 16px 0 0;
+  transition: transform 0.6s ease, filter 0.6s ease;
+  cursor: zoom-in;
+}
+
+.gallery-carousel .carousel-inner img:hover {
+  transform: scale(1.05);
+  filter: brightness(0.9);
+}
+
+/*----------------------------------------
+  Controles personalizados (prev/next)
+----------------------------------------*/
+.gallery-carousel .carousel-control-prev,
+.gallery-carousel .carousel-control-next {
+  width: 50px;
+  height: 50px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.8;
+  background-color: var(--airbnb-pink);
+  border-radius: 50%;
+  transition: opacity 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.gallery-carousel .carousel-control-prev:hover,
+.gallery-carousel .carousel-control-next:hover {
+  opacity: 1;
+}
+
+.gallery-carousel .carousel-control-prev {
+  left: 15px;
+}
+
+.gallery-carousel .carousel-control-next {
+  right: 15px;
+}
+
+.gallery-carousel .carousel-control-prev-icon,
+.gallery-carousel .carousel-control-next-icon {
+  filter: invert(1);
+  font-size: 24px;
+}
+
+/*----------------------------------------
+  Miniaturas (thumbnails) para navegación rápida
+----------------------------------------*/
+.gallery-carousel .thumbnails {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding: 15px;
+  background: var(--airbnb-light-gray);
+  border-radius: 0 0 16px 16px;
+}
+
+.gallery-carousel .thumbnails img {
+  width: 80px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  opacity: 0.6;
+  border: 2px solid transparent;
+  transition: opacity 0.3s ease, border-color 0.3s ease;
+}
+
+.gallery-carousel .thumbnails img:hover,
+.gallery-carousel .thumbnails img.active {
+  opacity: 1;
+  border-color: var(--airbnb-pink);
+  box-shadow: 0 0 8px var(--airbnb-pink);
+}
+
+/*========================================
+=            Responsive Design            =
+========================================*/
+@media (max-width: 768px) {
+  .gallery-carousel .carousel-inner img {
+    height: 300px;
+  }
+
+  .gallery-carousel .thumbnails img {
+    width: 60px;
+    height: 40px;
+  }
+}
