@@ -6,13 +6,31 @@
   <title>Bienvenido - WorkBreak</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <link rel="stylesheet" href="estilos.css">
+  <style>
+    #logoWorkBreak {
+      width: 1000px;
+      height: 1000px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    #logoWorkBreak:hover {
+      transform: scale(1.1);
+    }
+  </style>
 </head>
 <body class="bg-light d-flex align-items-center justify-content-center vh-100">
+
+  <!-- Logo que redirige solo si está en modo admin -->
+  <div class="position-absolute top-0 start-0 m-4">
+    <img src="img/celular.png"
+         alt="Logo WorkBreak"
+         id="logoWorkBreak"
+         title="Ir al panel (solo admin)" />
+  </div>
 
   <div id="formulario" class="card p-5 shadow bienvenidos" style="max-width: 400px; width: 100%;">
     <!-- Se llena con JavaScript -->
   </div>
-  
 
   <script>
     let modo = "cliente"; // "cliente" o "admin"
@@ -51,7 +69,7 @@
       }
       localStorage.setItem("nombreCliente", nombre);
       localStorage.setItem("rol", "cliente");
-      window.location.href = "index.html"; // 👈 redirige a index
+      window.location.href = "index.html";
     }
 
     function loginAdmin() {
@@ -66,14 +84,21 @@
         localStorage.setItem("rol", "admin");
         localStorage.setItem("nombreAdmin", email);
         alert("Login exitoso.");
-        window.location.href = "index.html"; // 👈 redirige a index
+        window.location.href = "index.html";
       } else {
         alert("Credenciales incorrectas.");
       }
     }
 
-    localStorage.setItem("rol", "cliente"); // si entra como cliente
-    localStorage.setItem("rol", "admin");   // si entra como admin
+    // Evento del logo: solo redirige si está en modo admin
+    document.addEventListener("DOMContentLoaded", () => {
+      const logo = document.getElementById("logoWorkBreak");
+      logo.addEventListener("click", () => {
+        if (modo === "admin") {
+          window.location.href = "index.html";
+        }
+      });
+    });
 
     mostrarFormulario();
   </script>

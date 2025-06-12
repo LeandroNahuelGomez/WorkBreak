@@ -170,7 +170,7 @@ nav {
 }
 
 .info-btn, .book-btn {
-    padding: 1.3rem 3rem;   /* Más grande y ancho */
+   padding: 0.8rem 1.5rem;   /* Más grande y ancho */
     font-size: 1.3rem;      /* Texto más visible */
     font-weight: 600;
     border-radius: 8px;
