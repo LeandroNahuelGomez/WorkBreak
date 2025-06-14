@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Carrito de Reservas</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 20px auto;
+    }
+    h1 {
+      text-align: center;
+    }
+    .carrito-item {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+    .carrito-item h2 {
+      margin: 0 0 5px;
+    }
+    .carrito-item p {
+      margin: 2px 0;
+    }
+    .total {
+      font-weight: bold;
+      font-size: 1.2em;
+      text-align: right;
+      margin-top: 20px;
+    }
+    button {
+      background-color: #d9534f;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+    button:hover {
+      background-color: #c9302c;
+    }
+    #descargar-pdf-btn {
+      background-color: #0275d8;
+      margin-top: 15px;
+    }
+    #descargar-pdf-btn:hover {
+      background-color: #025aa5;
+    }
+
+    /* Modal Ticket */
+    #overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 1000;
+    }
+    #ticket {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      z-index: 1001;
+      display: none;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    }
+    #ticket h3 {
+      text-align: center;
+    }
+    .ticket-item {
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
+    }
+    #cerrar-ticket-btn {
+      display: block;
+      margin: 15px auto 0;
+      background-color: #555;
+    }
+    #cerrar-ticket-btn:hover {
+      background-color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>Carrito de Reservas</h1>
+
+  <div id="carrito-contenedor"></div>
+  <div class="total" id="total-carrito">Total: ARS 0</div>
+
+  <div id="acciones" style="text-align:center; margin-top: 20px;">
+    <button id="vaciar-carrito-btn">Vaciar Carrito</button>
+    <button id="confirmar-compra-btn" style="background-color: #5cb85c; margin-left: 10px;">Confirmar Compra</button>
+  </div>
+
+  <div id="overlay"></div>
+  <div id="ticket">
+    <h3>¡Gracias por tu compra!</h3>
+    <div id="ticket-contenido"></div>
+    <button id="cerrar-ticket-btn">Cerrar</button>
+    <button id="descargar-pdf-btn" style="display: none;">Descargar Ticket PDF</button>
+  </div>
+
+  <script>
+    function obtenerCarrito() {
+      const carritoJSON = localStorage.getItem('carritoReservas');
+      return carritoJSON ? JSON.parse(carritoJSON) : [];
+    }
+
+    function guardarCarrito(carrito) {
+      localStorage.setItem('carritoReservas', JSON.stringify(carrito));
+    }
+
+    function mostrarCarrito() {
+      const contenedor = document.getElementById('carrito-contenedor');
+      const carrito = obtenerCarrito();
+      contenedor.innerHTML = '';
+
+      if (carrito.length === 0) {
+        contenedor.innerHTML = '<p>El carrito está vacío.</p>';
+        document.getElementById('total-carrito').textContent = 'Total: ARS 0';
+        return;
+      }
+
+      let total = 0;
+
+      carrito.forEach((item, index) => {
+        total += Number(item.total) || 0;
+
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add('carrito-item');
+
+        itemDiv.innerHTML = `
+          <h2>${item.nombre}</h2>
+          <p><strong>Ubicación:</strong> ${item.ubicacion}</p>
+          <p><strong>Check-in:</strong> ${item.checkin || 'N/A'}</p>
+          <p><strong>Check-out:</strong> ${item.checkout || 'N/A'}</p>
+          <p><strong>Noches:</strong> ${item.noches || 'N/A'}</p>
+          <p><strong>Huéspedes:</strong> ${item.guests || 'N/A'}</p>
+          <p><strong>Total a pagar:</strong> ARS ${Number(item.total).toFixed(2)}</p>
+          <button data-index="${index}" class="btn-eliminar">Eliminar</button>
+        `;
+
+        contenedor.appendChild(itemDiv);
+      });
+
+      document.getElementById('total-carrito').textContent = `Total: ARS ${total.toFixed(2)}`;
+
+      document.querySelectorAll('.btn-eliminar').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const idx = parseInt(e.target.getAttribute('data-index'));
+          eliminarDelCarrito(idx);
+        });
+      });
+    }
+
+    function eliminarDelCarrito(index) {
+      let carrito = obtenerCarrito();
+      carrito.splice(index, 1);
+      guardarCarrito(carrito);
+      mostrarCarrito();
+    }
+
+    function vaciarCarrito() {
+      localStorage.removeItem('carritoReservas');
+      mostrarCarrito();
+    }
+
+    function confirmarCompra() {
+      const carrito = obtenerCarrito();
+      if (carrito.length === 0) {
+        alert('El carrito está vacío.');
+        return;
+      }
+
+      let total = 0;
+      const ticketContenido = document.getElementById('ticket-contenido');
+      ticketContenido.innerHTML = '';
+
+      carrito.forEach(item => {
+        total += Number(item.total) || 0;
+
+        ticketContenido.innerHTML += `
+          <div class="ticket-item">
+            <p><strong>Espacio:</strong> ${item.nombre}</p>
+            <p><strong>Ubicación:</strong> ${item.ubicacion}</p>
+            <p><strong>Fechas:</strong> ${item.checkin || 'N/A'} a ${item.checkout || 'N/A'}</p>
+            <p><strong>Noches:</strong> ${item.noches || 'N/A'}</p>
+            <p><strong>Huéspedes:</strong> ${item.guests || 'N/A'}</p>
+            <p><strong>Total:</strong> ARS ${Number(item.total).toFixed(2)}</p>
+          </div>
+        `;
+      });
+
+      const fecha = new Date().toLocaleString();
+      ticketContenido.innerHTML += `<p style="text-align: right;"><strong>Total Pagado:</strong> ARS ${total.toFixed(2)}</p>`;
+      ticketContenido.innerHTML += `<p style="text-align: right;">Fecha: ${fecha}</p>`;
+
+      document.getElementById('overlay').style.display = 'block';
+      document.getElementById('ticket').style.display = 'block';
+      document.getElementById('descargar-pdf-btn').style.display = 'inline-block';
+
+      document.getElementById('carrito-contenedor').style.display = 'none';
+      document.getElementById('total-carrito').style.display = 'none';
+      document.getElementById('acciones').style.display = 'none';
+
+      vaciarCarrito();
+    }
+
+    function cerrarTicket() {
+      document.getElementById('overlay').style.display = 'none';
+      document.getElementById('ticket').style.display = 'none';
+      location.reload(); // para volver a mostrar el carrito vacío
+    }
+
+    function descargarPDF() {
+      const element = document.getElementById('ticket');
+      html2pdf().set({
+        margin: 0.5,
+        filename: 'ticket_reserva.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      }).from(element).save();
+    }
+
+    function cargarCarritoPrueba() {
+      const datosPrueba = [
+        {
+          nombre: 'Espacio Cowork Belgrano',
+          ubicacion: 'Belgrano, CABA',
+          checkin: '2025-06-15',
+          checkout: '2025-06-17',
+          noches: 2,
+          guests: 3,
+          total: 24000
+        },
+        {
+          nombre: 'Oficina Privada Palermo',
+          ubicacion: 'Palermo, CABA',
+          checkin: '2025-06-20',
+          checkout: '2025-06-21',
+          noches: 1,
+          guests: 2,
+          total: 15000
+        }
+      ];
+      guardarCarrito(datosPrueba);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      cargarCarritoPrueba();
+      mostrarCarrito();
+
+      document.getElementById('vaciar-carrito-btn').addEventListener('click', () => {
+        if (confirm('¿Seguro que quieres vaciar el carrito?')) {
+          vaciarCarrito();
+        }
+      });
+
+      document.getElementById('confirmar-compra-btn').addEventListener('click', confirmarCompra);
+      document.getElementById('cerrar-ticket-btn').addEventListener('click', cerrarTicket);
+      document.getElementById('descargar-pdf-btn').addEventListener('click', descargarPDF);
+    });
+  </script>
+</body>
+</html>
