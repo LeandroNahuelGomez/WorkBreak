@@ -11,10 +11,10 @@ const {
 } = require("../controllers/usuarioController.js"); 
 
 // Rutas RESTful
-router.get("/usuarios", obtenerUsuarios);             // GET todos
-router.get("/usuarios/:id", obtenerUsuarioPorId);     // GET uno por ID
-router.post("/usuarios", crearUsuario);               // POST (crear)
-router.put("/usuarios/:id", actualizarUsuario);       // PUT (editar)
-router.delete("/usuarios/:id", eliminarUsuario);      // DELETE (eliminar)
+router.get("/", obtenerUsuarios);             // GET todos
+router.get("/:id", obtenerUsuarioPorId);     // GET uno por ID
+router.post("/", crearUsuario);               // POST (crear)
+router.put("/:id", actualizarUsuario);       // PUT (editar)
+router.delete("/:id", eliminarUsuario);      // DELETE (eliminar)
 
 module.exports = router;
