@@ -1,5 +1,5 @@
 const Roles = require('./roles.model');
-const Usuarios = require('./usuarios.model');
+const Usuarios = require('./usuario.model');
 const TipoProducto = require('./tipoProducto.model');
 const Producto = require('./producto.model');
 const Ubicacion = require('./ubicacion.model');
