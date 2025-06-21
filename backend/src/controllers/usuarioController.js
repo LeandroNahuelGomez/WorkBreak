@@ -1,19 +1,23 @@
-const Usuario = require("../models/usuario.model");
+const { DataTypes } = require("sequelize")
+const { sequelize } = require("../config/db.config")
+const Usuario = require("../models/usuario.model")(sequelize, DataTypes);
+
 
 const obtenerUsuarios = async (req, res) => {
-    try{
+    try {
         const usuarios = await Usuario.findAll();
         res.json(usuarios);
-    } catch (error){
-        res.status(400).json({error: "Error al obtener usuarios"});
+    } catch (error) {
+        console.error("❌ Error al obtener usuarios:", error); // Esto te muestra el error real en consola
+        res.status(500).json({ error: "Error interno del servidor", detalle: error.message });
     }
 };
 
 const obtenerUsuarioPorId = async (req, res) => {
-  const { id } = req.params;
-  const usuario = await Usuario.findByPk(id);
-  if (usuario) res.json(usuario);
-  else res.status(404).json({ error: "Usuario no encontrado" });
+    const { id } = req.params;
+    const usuario = await Usuario.findByPk(id);
+    if (usuario) res.json(usuario);
+    else res.status(404).json({ error: "Usuario no encontrado" });
 };
 
 const crearUsuario = async (req, res) => {
@@ -60,26 +64,26 @@ const crearUsuario = async (req, res) => {
 };
 
 const actualizarUsuario = async (req, res) => {
-  const { id } = req.params;
-  const datos = req.body;
-  const usuario = await Usuario.findByPk(id);
-  if (!usuario) return res.status(404).json({ error: "No encontrado" });
-  await usuario.update(datos);
-  res.json(usuario);
+    const { id } = req.params;
+    const datos = req.body;
+    const usuario = await Usuario.findByPk(id);
+    if (!usuario) return res.status(404).json({ error: "No encontrado" });
+    await usuario.update(datos);
+    res.json(usuario);
 };
 
 const eliminarUsuario = async (req, res) => {
-  const { id } = req.params;
-  const usuario = await Usuario.findByPk(id);
-  if (!usuario) return res.status(404).json({ error: "No encontrado" });
-  await usuario.destroy();
-  res.json({ mensaje: "Eliminado" });
+    const { id } = req.params;
+    const usuario = await Usuario.findByPk(id);
+    if (!usuario) return res.status(404).json({ error: "No encontrado" });
+    await usuario.destroy();
+    res.json({ mensaje: "Eliminado" });
 };
 
 module.exports = {
-  obtenerUsuarios,
-  obtenerUsuarioPorId,
-  crearUsuario,
-  actualizarUsuario,
-  eliminarUsuario,
+    obtenerUsuarios,
+    obtenerUsuarioPorId,
+    crearUsuario,
+    actualizarUsuario,
+    eliminarUsuario,
 };

@@ -1,4 +1,8 @@
-const Producto = require("../models/producto.model");
+const { DataTypes } = require("sequelize")
+const { sequelize } = require("../config/db.config")
+
+const Producto = require("../models/producto.model")(sequelize, DataTypes);
+
 
 const obtenerProducto = async (req, res) => {
     try {
