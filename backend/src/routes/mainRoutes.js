@@ -5,7 +5,7 @@ const usuarioRoutes = require("./usuarioRoutes");
 
 //Middleware para prefijo de version API
 router.use("/api/v1/producto", productoRoutes);
-router.use("/api/v1/usuarios", usuarioRoutes);
+router.use("/api/v1/usuario", usuarioRoutes);
 
 
 module.exports = router;

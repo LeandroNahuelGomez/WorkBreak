@@ -1,7 +1,8 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/db.config");
 
-const AtributoProducto = sequelize.define('AtributoProducto', {
+module.exports = (sequelize, DataTypes) =>{
+const atributoProducto = sequelize.define('AtributoProducto', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -24,4 +25,5 @@ const AtributoProducto = sequelize.define('AtributoProducto', {
   timestamps: false
 });
 
-module.exports = AtributoProducto;
+return atributoProducto;
+};
