@@ -35,7 +35,6 @@
 </head>
 <body class="bg-light d-flex align-items-center justify-content-center vh-100">
 
-  <!-- Logo WorkBreak (redirige solo si está en modo admin) -->
   <div class="position-absolute top-0 start-0 m-4">
     <img
       src="../img/Celular.png"
@@ -50,14 +49,11 @@
 
   <main>
     <section id="formulario" class="card p-5 shadow bienvenidos" style="max-width: 400px; width: 100%;">
-      <!-- Formulario generado por JS -->
+      <!-- Aquí va el formulario -->
     </section>
   </main>
 
   <script>
-    // Estado inicial
-    let modo = localStorage.getItem('modo') || 'cliente';
-
     const contenedor = document.getElementById('formulario');
 
     function mostrarError(mensaje) {
@@ -77,6 +73,8 @@
 
     function mostrarFormulario() {
       limpiarError();
+
+      let modo = localStorage.getItem('modo') || 'cliente';
 
       if (modo === 'cliente') {
         contenedor.innerHTML = `
@@ -104,6 +102,7 @@
     }
 
     function cambiarModo() {
+      let modo = localStorage.getItem('modo') || 'cliente';
       modo = modo === 'cliente' ? 'admin' : 'cliente';
       localStorage.setItem('modo', modo);
       mostrarFormulario();
@@ -118,7 +117,7 @@
       }
       localStorage.setItem('nombreCliente', nombre);
       localStorage.setItem('rol', 'cliente');
-      localStorage.removeItem('modo');
+      localStorage.setItem('modo', 'cliente');
       window.location.href = "index.html";
     }
 
@@ -142,7 +141,7 @@
       if (email === "admin@workbreak.com" && pass === "1234") {
         localStorage.setItem('rol', 'admin');
         localStorage.setItem('nombreAdmin', email);
-        localStorage.removeItem('modo');
+        localStorage.setItem('modo', 'admin');
         alert("Login exitoso.");
         window.location.href = "index.html";
       } else {
@@ -150,13 +149,11 @@
       }
     }
 
-    // Evento del logo
     document.addEventListener("DOMContentLoaded", () => {
       mostrarFormulario();
 
       const logo = document.getElementById("logoWorkBreak");
       logo.addEventListener("click", () => {
-        // Solo redirige si estamos visualizando el modo admin actual
         const modoActual = localStorage.getItem("modo");
         if (modoActual === "admin") {
           window.location.href = "index.html";

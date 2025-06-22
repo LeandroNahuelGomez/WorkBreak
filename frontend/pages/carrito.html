@@ -112,15 +112,18 @@
   </div>
 
   <script>
+    // Función para obtener carrito desde localStorage (la clave que usamos en index.html es "carrito")
     function obtenerCarrito() {
-      const carritoJSON = localStorage.getItem('carritoReservas');
+      const carritoJSON = localStorage.getItem('carrito');
       return carritoJSON ? JSON.parse(carritoJSON) : [];
     }
 
+    // Guardar carrito en localStorage
     function guardarCarrito(carrito) {
-      localStorage.setItem('carritoReservas', JSON.stringify(carrito));
+      localStorage.setItem('carrito', JSON.stringify(carrito));
     }
 
+    // Mostrar carrito en pantalla
     function mostrarCarrito() {
       const contenedor = document.getElementById('carrito-contenedor');
       const carrito = obtenerCarrito();
@@ -135,19 +138,16 @@
       let total = 0;
 
       carrito.forEach((item, index) => {
-        total += Number(item.total) || 0;
+        total += Number(item.precio) || 0;
 
         const itemDiv = document.createElement('div');
         itemDiv.classList.add('carrito-item');
 
         itemDiv.innerHTML = `
           <h2>${item.nombre}</h2>
-          <p><strong>Ubicación:</strong> ${item.ubicacion}</p>
-          <p><strong>Check-in:</strong> ${item.checkin || 'N/A'}</p>
-          <p><strong>Check-out:</strong> ${item.checkout || 'N/A'}</p>
-          <p><strong>Noches:</strong> ${item.noches || 'N/A'}</p>
-          <p><strong>Huéspedes:</strong> ${item.guests || 'N/A'}</p>
-          <p><strong>Total a pagar:</strong> ARS ${Number(item.total).toFixed(2)}</p>
+          <p><strong>Descripción:</strong> ${item.descripcion}</p>
+          <p><strong>Categoría:</strong> ${item.categoria}</p>
+          <p><strong>Precio:</strong> ARS ${Number(item.precio).toFixed(2)}</p>
           <button data-index="${index}" class="btn-eliminar">Eliminar</button>
         `;
 
@@ -164,6 +164,7 @@
       });
     }
 
+    // Eliminar producto del carrito por índice
     function eliminarDelCarrito(index) {
       let carrito = obtenerCarrito();
       carrito.splice(index, 1);
@@ -171,11 +172,13 @@
       mostrarCarrito();
     }
 
+    // Vaciar todo el carrito
     function vaciarCarrito() {
-      localStorage.removeItem('carritoReservas');
+      localStorage.removeItem('carrito');
       mostrarCarrito();
     }
 
+    // Confirmar compra y mostrar ticket modal
     function confirmarCompra() {
       const carrito = obtenerCarrito();
       if (carrito.length === 0) {
@@ -188,16 +191,14 @@
       ticketContenido.innerHTML = '';
 
       carrito.forEach(item => {
-        total += Number(item.total) || 0;
+        total += Number(item.precio) || 0;
 
         ticketContenido.innerHTML += `
           <div class="ticket-item">
             <p><strong>Espacio:</strong> ${item.nombre}</p>
-            <p><strong>Ubicación:</strong> ${item.ubicacion}</p>
-            <p><strong>Fechas:</strong> ${item.checkin || 'N/A'} a ${item.checkout || 'N/A'}</p>
-            <p><strong>Noches:</strong> ${item.noches || 'N/A'}</p>
-            <p><strong>Huéspedes:</strong> ${item.guests || 'N/A'}</p>
-            <p><strong>Total:</strong> ARS ${Number(item.total).toFixed(2)}</p>
+            <p><strong>Descripción:</strong> ${item.descripcion}</p>
+            <p><strong>Categoría:</strong> ${item.categoria}</p>
+            <p><strong>Precio:</strong> ARS ${Number(item.precio).toFixed(2)}</p>
           </div>
         `;
       });
@@ -217,12 +218,14 @@
       vaciarCarrito();
     }
 
+    // Cerrar ticket modal
     function cerrarTicket() {
       document.getElementById('overlay').style.display = 'none';
       document.getElementById('ticket').style.display = 'none';
-      location.reload(); // para volver a mostrar el carrito vacío
+      location.reload(); // recarga para mostrar carrito vacío
     }
 
+    // Descargar ticket como PDF
     function descargarPDF() {
       const element = document.getElementById('ticket');
       html2pdf().set({
@@ -234,32 +237,7 @@
       }).from(element).save();
     }
 
-    function cargarCarritoPrueba() {
-      const datosPrueba = [
-        {
-          nombre: 'Espacio Cowork Belgrano',
-          ubicacion: 'Belgrano, CABA',
-          checkin: '2025-06-15',
-          checkout: '2025-06-17',
-          noches: 2,
-          guests: 3,
-          total: 24000
-        },
-        {
-          nombre: 'Oficina Privada Palermo',
-          ubicacion: 'Palermo, CABA',
-          checkin: '2025-06-20',
-          checkout: '2025-06-21',
-          noches: 1,
-          guests: 2,
-          total: 15000
-        }
-      ];
-      guardarCarrito(datosPrueba);
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
-      cargarCarritoPrueba();
       mostrarCarrito();
 
       document.getElementById('vaciar-carrito-btn').addEventListener('click', () => {

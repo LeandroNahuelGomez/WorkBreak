@@ -1,80 +1,6 @@
-<!DOCTYPE html>
-<html lang="es">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>WorkBreak - Home</title>
-  <link rel="stylesheet" href="../styles/estilos.css" />
-</head>
-
-<body>
-<header class="header">
-  <img src="../img/logo.png" alt="Logo Workbreak" class="logo" />
-  <h1 class="titulo">WorkBreak</h1>
-  <nav class="nav-derecha">
-    <a href="bienvenido.html" class="admin-btn">Ingresar como admin</a>
-    <button id="toggle-dark" class="admin-btn">🌙 Modo oscuro</button>
-    <a href="carrito.html" class="admin-btn carrito-btn">🛒</a>
-  </nav>
-</header>
-
-<main class="main-content">
-  <!-- Filters Section -->
-  <section class="filters">
-    <h3>Filtrar por:</h3>
-    <div class="filter-row">
-      <div class="filter-item active" data-filter="todos">Todos</div>
-      <div class="filter-item" data-filter="alojamiento">Alojamiento</div>
-      <div class="filter-item" data-filter="restaurantes">Restaurantes</div>
-      <div class="filter-item" data-filter="autos">Autos</div>
-      <div class="filter-item" data-filter="vuelos">Vuelos</div>
-      <div class="filter-item" data-filter="paquetes">Paquetes</div>
-    </div>
-  </section>
-
-  <!-- Productos -->
-  <section class="workspaces-grid" id="workspacesGrid">
-    <!-- Aquí se insertan los productos dinámicamente -->
-  </section>
-
-  <!-- Botón agregar producto solo admin -->
-  <section id="admin-section" style="margin-top: 2rem; display:none;">
-    <button id="btnAgregarProducto" class="btn btn-success">+ Agregar Producto</button>
-  </section>
-
-  <!-- Modal agregar/modificar producto -->
-  <div id="modalAgregar" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index: 9999;">
-    <div style="background:white; padding:1.5rem; border-radius:8px; width: 90%; max-width: 400px; position: relative;">
-      <h2 id="modalTitulo">Agregar producto</h2>
-      <form id="formAgregarProducto" novalidate>
-        <input type="hidden" id="productoId" />
-        <label for="nombreProd">Nombre</label>
-        <input id="nombreProd" type="text" required />
-        <label for="descripcionProd">Descripción</label>
-        <textarea id="descripcionProd" required></textarea>
-        <label for="precioProd">Precio</label>
-        <input id="precioProd" type="number" min="0" step="0.01" required />
-        <label for="categoriaProd">Categoría</label>
-        <select id="categoriaProd" required>
-          <option value="">Seleccionar...</option>
-          <option value="alojamiento">Alojamiento</option>
-          <option value="restaurantes">Restaurantes</option>
-          <option value="autos">Autos</option>
-          <option value="vuelos">Vuelos</option>
-          <option value="paquetes">Paquetes</option>
-        </select>
-        <div style="margin-top: 1rem;">
-          <button type="submit" class="btn btn-primary">Guardar</button>
-          <button type="button" id="btnCancelarAgregar" class="btn btn-secondary">Cancelar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</main>
-
-<script>
-  // Leemos el rol del localStorage
+// ================================
+  // Variables y elementos DOM
+  // ================================
   let rol = localStorage.getItem("rol") || "cliente";
 
   const adminSection = document.getElementById("admin-section");
@@ -84,18 +10,26 @@
   const modalTitulo = document.getElementById("modalTitulo");
   const workspacesGrid = document.getElementById("workspacesGrid");
 
-  // Array de productos inicial
-  let productos = [
-    { id: 1, nombre: "Sala de Estudio Central", descripcion: "Microcentro, Buenos Aires", precio: 4200, categoria: "alojamiento" },
-    { id: 2, nombre: "CoWork Recoleta", descripcion: "Recoleta, Buenos Aires", precio: 9800, categoria: "alojamiento" },
-    { id: 3, nombre: "Sala Conferencias Madero", descripcion: "Puerto Madero, Buenos Aires", precio: 21500, categoria: "alojamiento" },
-    { id: 4, nombre: "WorkSpot Retiro", descripcion: "Retiro, Buenos Aires", precio: 7650, categoria: "alojamiento" }
-  ];
+  let productos = [];
 
-  function generarId() {
-    return productos.length ? Math.max(...productos.map(p => p.id)) + 1 : 1;
+  // ================================
+  // Función para cargar productos desde API
+  // ================================
+  async function cargarProductos() {
+    try {
+      const res = await fetch("/api/v1/producto");
+      if (!res.ok) throw new Error("Error al cargar productos");
+      productos = await res.json();
+      renderProductos(getFiltroActivo());
+    } catch (error) {
+      alert("No se pudieron cargar los productos");
+      console.error(error);
+    }
   }
 
+  // ================================
+  // Función para mostrar productos filtrados
+  // ================================
   function renderProductos(filtro = "todos") {
     workspacesGrid.innerHTML = "";
     productos.forEach(p => {
@@ -109,10 +43,10 @@
           <div class="workspace-image"></div>
           <div class="workspace-info">
             <h3 class="workspace-name">${p.nombre}</h3>
-            <div class="workspace-location">📍 ${p.descripcion}</div>
+            <div class="workspace-location">📍 ${p.descripcion || ""}</div>
           </div>
           <div class="workspace-price">
-            <div class="price-current">ARS ${p.precio.toFixed(2)}</div>
+            <div class="price-current">ARS ${parseFloat(p.precio).toFixed(2)}</div>
             ${rol === "admin" ? `
               <button class="btn btn-warning btn-sm btnEditar" data-id="${p.id}">Editar</button>
               <button class="btn btn-danger btn-sm btnEliminar" data-id="${p.id}">Eliminar</button>
@@ -128,6 +62,9 @@
     asignarEventos();
   }
 
+  // ================================
+  // Asignar eventos a botones generados
+  // ================================
   function asignarEventos() {
     document.querySelectorAll(".info-btn").forEach(btn => {
       btn.onclick = () => {
@@ -146,11 +83,18 @@
       });
 
       document.querySelectorAll(".btnEliminar").forEach(btn => {
-        btn.onclick = () => {
+        btn.onclick = async () => {
           const id = parseInt(btn.dataset.id);
           if (confirm("¿Querés eliminar este producto?")) {
-            productos = productos.filter(p => p.id !== id);
-            renderProductos(getFiltroActivo());
+            try {
+              const res = await fetch(`/api/v1/producto/${id}`, { method: "DELETE" });
+              if (!res.ok) throw new Error("No se pudo eliminar el producto");
+              productos = productos.filter(p => p.id !== id);
+              renderProductos(getFiltroActivo());
+            } catch (error) {
+              alert("Error eliminando el producto");
+              console.error(error);
+            }
           }
         };
       });
@@ -179,19 +123,28 @@
     }
   }
 
+  // ================================
+  // Mostrar u ocultar sección admin según rol
+  // ================================
   function mostrarPanelSegunRol() {
     if (rol === "admin") {
       adminSection.style.display = "block";
     } else {
       adminSection.style.display = "none";
     }
-    renderProductos(getFiltroActivo());
+    cargarProductos();
   }
 
+  // ================================
+  // Botón agregar producto abre modal
+  // ================================
   document.getElementById("btnAgregarProducto").onclick = () => {
     abrirModalAgregar();
   };
 
+  // ================================
+  // Abrir modal para agregar producto
+  // ================================
   function abrirModalAgregar() {
     modalTitulo.textContent = "Agregar producto";
     formAgregar.reset();
@@ -199,21 +152,30 @@
     modalAgregar.style.display = "flex";
   }
 
+  // ================================
+  // Abrir modal para editar producto
+  // ================================
   function abrirModalEditar(prod) {
     modalTitulo.textContent = "Editar producto";
     document.getElementById("productoId").value = prod.id;
     document.getElementById("nombreProd").value = prod.nombre;
-    document.getElementById("descripcionProd").value = prod.descripcion;
+    document.getElementById("descripcionProd").value = prod.descripcion || "";
     document.getElementById("precioProd").value = prod.precio;
     document.getElementById("categoriaProd").value = prod.categoria;
     modalAgregar.style.display = "flex";
   }
 
+  // ================================
+  // Cancelar agregar/editar cierra modal
+  // ================================
   btnCancelarAgregar.onclick = () => {
     modalAgregar.style.display = "none";
   };
 
-  formAgregar.onsubmit = (e) => {
+  // ================================
+  // Enviar formulario agregar/editar producto
+  // ================================
+  formAgregar.onsubmit = async (e) => {
     e.preventDefault();
 
     const id = document.getElementById("productoId").value;
@@ -227,24 +189,51 @@
       return;
     }
 
-    if (id) {
-      const prodIndex = productos.findIndex(p => p.id === parseInt(id));
-      if (prodIndex >= 0) {
-        productos[prodIndex] = { id: parseInt(id), nombre, descripcion, precio, categoria };
-      }
-    } else {
-      productos.push({ id: generarId(), nombre, descripcion, precio, categoria });
-    }
+    const productoData = { nombre, descripcion, precio, categoria };
 
-    modalAgregar.style.display = "none";
-    renderProductos(getFiltroActivo());
+    try {
+      let res;
+      if (id) {
+        // Editar producto
+        res = await fetch(`/api/v1/producto/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(productoData)
+        });
+      } else {
+        // Crear producto
+        res = await fetch("/api/v1/producto", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(productoData)
+        });
+      }
+
+      if (!res.ok) {
+        const errorRes = await res.json();
+        throw new Error(errorRes.error || "Error en la operación");
+      }
+
+      modalAgregar.style.display = "none";
+      await cargarProductos();
+
+    } catch (error) {
+      alert("Error guardando el producto: " + error.message);
+      console.error(error);
+    }
   };
 
+  // ================================
+  // Obtener filtro activo (para render)
+  // ================================
   function getFiltroActivo() {
     const filtro = document.querySelector(".filter-item.active");
     return filtro ? filtro.dataset.filter : "todos";
   }
 
+  // ================================
+  // Evento para cambiar filtro y renderizar
+  // ================================
   document.querySelectorAll(".filter-item").forEach(filtro => {
     filtro.onclick = () => {
       document.querySelectorAll(".filter-item").forEach(f => f.classList.remove("active"));
@@ -253,9 +242,14 @@
     };
   });
 
+  // ================================
+  // Mostrar panel según rol y cargar productos
+  // ================================
   mostrarPanelSegunRol();
 
+  // ================================
   // Modo oscuro
+  // ================================
   document.addEventListener("DOMContentLoaded", () => {
     const toggleBtn = document.getElementById("toggle-dark");
     if (!toggleBtn) return;
@@ -276,7 +270,5 @@
       localStorage.setItem("modoOscuro", modoActual);
     });
   });
-</script>
 
-</body>
-</html>
+
