@@ -83,35 +83,6 @@ nav {
   color: #0036d8 !important;
   font-weight: 700;
 }
-
-/* ------------------------------------
-   Hero / Bienvenida
------------------------------------- */
-.hero {
-    background: linear-gradient(135deg, #ff6b35, #f7931e);
-    padding: 3rem 0;
-    color: white;
-}
-
-.hero-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 2rem;
-    text-align: center;
-}
-
-.hero h1 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    font-weight: 700;
-}
-
-.hero p {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-    opacity: 0.9;
-}
-
 /* ------------------------------------
    Formulario de Búsqueda
 ------------------------------------ */
@@ -408,45 +379,7 @@ nav {
     background: #ff6b35;
     color: white;
 }
-/* -------------------
-   Sección Bienvenidos
-------------------- */
-.bienvenidos {
-    background-color: white;
-    border: 3px solid #ff6b35;
-    border-radius: 1rem;
-    box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
-}
 
-.bienvenidos h2 {
-    color: #ff6b35;
-    font-weight: 700;
-}
-
-.bienvenidos p {
-    color: #555;
-}
-
-.bienvenidos .btn-primary {
-    background-color: #ff6b35;
-    border-color: #ff6b35;
-}
-
-.bienvenidos .btn-primary:hover {
-    background-color: #e05e2a;
-    border-color: #e05e2a;
-}
-
-.bienvenidos .btn-outline-secondary {
-    border-color: #ff6b35;
-    color: #ff6b35;
-}
-
-.bienvenidos .btn-outline-secondary:hover {
-    background-color: #ff6b35;
-    color: white;
-    border-color: #ff6b35;
-}
 /* ------------------------------------
    Detalle de espacio de trabajo
 ------------------------------------ */
@@ -1458,4 +1391,140 @@ body {
 
 .btn-secondary:hover {
   background-color: #545b62;
+}
+
+
+
+
+
+/* ------------------------------------
+   Hero / Bienvenida
+------------------------------------ */
+.hero {
+    background: linear-gradient(135deg, #ff6b35, #f7931e);
+    padding: 3rem 0;
+    color: white;
+}
+
+.hero-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.bienvenidos {
+    background-color: white;
+    border: 3px solid #ff6b35;
+    border-radius: 1rem;
+    box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
+    padding: 2rem;
+    max-width: 900px;
+    margin: 2rem auto;
+    box-sizing: border-box;
+}
+
+/* Título y textos */
+.bienvenidos h2 {
+    color: #ff6b35;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.bienvenidos p {
+    color: #555;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+/* Botones */
+.bienvenidos .btn-primary {
+    background-color: #ff6b35;
+    border-color: #ff6b35;
+}
+
+.bienvenidos .btn-primary:hover {
+    background-color: #e05e2a;
+    border-color: #e05e2a;
+}
+
+.bienvenidos .btn-outline-secondary {
+    border-color: #ff6b35;
+    color: #ff6b35;
+}
+
+.bienvenidos .btn-outline-secondary:hover {
+    background-color: #ff6b35;
+    color: white;
+    border-color: #ff6b35;
+}
+
+/* Contenedor flex para formulario e imagen */
+.bienvenidos .formulario-y-logo {
+  display: flex;
+  align-items: stretch; 
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+/* Formulario */
+.bienvenidos .formulario-y-logo form {
+  max-width: 450px;
+  flex: 1 1 300px;
+  font-size: 1.1rem;
+  box-sizing: border-box;
+
+  /* Centrar contenido dentro del formulario vertical y horizontalmente */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Inputs, selects, textarea */
+.bienvenidos .formulario-y-logo form input,
+.bienvenidos .formulario-y-logo form select,
+.bienvenidos .formulario-y-logo form textarea {
+  font-size: 1.1rem;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+}
+
+/* Botón */
+.bienvenidos .formulario-y-logo form button {
+  font-size: 1.1rem;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+}
+
+#logoWorkBreak {
+  width: auto;
+  height: 100%;
+  max-width: 450px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  user-select: none;
+  flex-shrink: 0;
+  object-fit: contain;
+  position: relative;
+  right: -100px;
+  top: 110px;
+}
+
+
+#logoWorkBreak:hover {
+  transform: scale(1.1);
 }
