@@ -1,20 +1,17 @@
 const API_BASE_URL = 'http://localhost:3000/api/v1/';
 
-const apiClient = {
+export const apiClient = {
     async fetchAPI(endpoint, options = {}) {
         try {
             const fullUrl = `${API_BASE_URL}${endpoint}`;
-            console.log(`Enviando petición a: ${fullUrl}`); // Log para depuración
-            
             const response = await fetch(fullUrl, {
                 headers: {
                     "Content-Type": "application/json",
-                    ...options.headers
+                    ...options.headers,
                 },
-                ...options
+                ...options,
             });
 
-            // Verifica si la respuesta es JSON
             const contentType = response.headers.get('content-type');
             if (!contentType || !contentType.includes('application/json')) {
                 const text = await response.text();
@@ -29,8 +26,7 @@ const apiClient = {
 
             return data;
         } catch (error) {
-            console.error("Detalle completo del error:", error);
             throw new Error(`Error al conectar con el API: ${error.message}`);
         }
     }
-}
+};

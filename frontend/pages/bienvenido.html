@@ -4,57 +4,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Bienvenido - WorkBreak</title>
+
+  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Estilos propios -->
   <link rel="stylesheet" href="../styles/estilos.css" />
-  <style>
-    #logoWorkBreak {
-      width: 150px;
-      height: 150px;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    #logoWorkBreak:hover {
-      transform: scale(1.1);
-    }
-    .visually-hidden {
-      position: absolute !important;
-      width: 1px !important;
-      height: 1px !important;
-      padding: 0 !important;
-      margin: -1px !important;
-      overflow: hidden !important;
-      clip: rect(0,0,0,0) !important;
-      border: 0 !important;
-    }
-    #mensaje-error {
-      color: red;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-    /* Para centrar solo el contenido (formulario), no el header */
-    main {
-      min-height: calc(100vh - 70px); /* ajusta según altura header */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-      background-color: #f8f9fa; /* similar a bg-light */
-    }
-  </style>
 </head>
 <body class="bg-light">
 
-  <!-- Header arriba -->
+  <!-- Header -->
   <header class="header">
-  <img src="../img/logo.png" alt="Logo Workbreak" class="logo" />
-  <h1 class="titulo">WorkBreak</h1>
-  <nav class="nav-derecha">
-    <a href="bienvenido.html" class="admin-btn">Ingresar como admin</a>
-    <button id="toggle-dark" class="admin-btn">🌙 Modo oscuro</button>
-    <a href="carrito.html" class="admin-btn carrito-btn">🛒</a>
-  </nav>
-</header>
-
+    <img src="../img/logo.png" alt="Logo Workbreak" class="logo" />
+    <h1 class="titulo">WorkBreak</h1>
+    <nav class="nav-derecha">
+      <a href="bienvenido.html" class="admin-btn">Ingresar como admin</a>
+      <button id="toggle-dark" class="admin-btn">🌙 Modo oscuro</button>
+      <a href="carrito.html" class="admin-btn carrito-btn">🛒</a>
+    </nav>
+  </header>
 
   <!-- Logo móvil arriba a la izquierda -->
   <div class="position-absolute top-0 start-0 m-4">
@@ -69,139 +37,15 @@
     />
   </div>
 
-  <!-- Contenido centrado (formulario) -->
+  <!-- Contenedor principal del formulario -->
   <main>
     <section id="formulario" class="card p-5 shadow bienvenidos" style="max-width: 400px; width: 100%;">
-      <!-- Aquí va el formulario o mensaje -->
+      <!-- El formulario dinámico se inyectará desde auth.js -->
     </section>
   </main>
 
-  <script>
-    const contenedor = document.getElementById('formulario');
+  <!-- Script de autenticación -->
+  <script type="module" src="../js/auth.js"></script>
 
-    function mostrarError(mensaje) {
-      let errorDiv = document.getElementById('mensaje-error');
-      if (!errorDiv) {
-        errorDiv = document.createElement('div');
-        errorDiv.id = 'mensaje-error';
-        contenedor.prepend(errorDiv);
-      }
-      errorDiv.textContent = mensaje;
-    }
-
-    function limpiarError() {
-      const errorDiv = document.getElementById('mensaje-error');
-      if (errorDiv) errorDiv.textContent = '';
-    }
-
-    function mostrarFormulario() {
-      limpiarError();
-
-      let modo = localStorage.getItem('modo') || 'cliente';
-
-      if (modo === 'cliente') {
-        contenedor.innerHTML = `
-          <h2 class="text-center mb-4">¡Bienvenido a WorkBreak!</h2>
-          <label for="nombreInput" class="visually-hidden">Nombre</label>
-          <input type="text" id="nombreInput" class="form-control mb-3" placeholder="Tu nombre" autocomplete="name" />
-          <button id="btnCliente" class="btn btn-primary w-100 mb-2">Ingresar como Cliente</button>
-          <button id="btnCambiarModo" class="btn btn-outline-secondary w-100">Ingresar como Administrador</button>
-        `;
-        document.getElementById('btnCliente').addEventListener('click', ingresarCliente);
-        document.getElementById('btnCambiarModo').addEventListener('click', cambiarModo);
-      } else {
-        contenedor.innerHTML = `
-          <h2 class="text-center mb-4">Login Administrador</h2>
-          <label for="emailInput" class="visually-hidden">Correo electrónico</label>
-          <input type="email" id="emailInput" class="form-control mb-3" placeholder="Correo electrónico" autocomplete="email" />
-          <label for="passInput" class="visually-hidden">Contraseña</label>
-          <input type="password" id="passInput" class="form-control mb-3" placeholder="Contraseña" autocomplete="current-password" />
-          <button id="btnAdmin" class="btn btn-dark w-100 mb-2">Ingresar</button>
-          <button id="btnCambiarModo" class="btn btn-outline-secondary w-100">Volver a Cliente</button>
-        `;
-        document.getElementById('btnAdmin').addEventListener('click', loginAdmin);
-        document.getElementById('btnCambiarModo').addEventListener('click', cambiarModo);
-      }
-    }
-
-    function cambiarModo() {
-      let modo = localStorage.getItem('modo') || 'cliente';
-      modo = modo === 'cliente' ? 'admin' : 'cliente';
-      localStorage.setItem('modo', modo);
-      mostrarFormulario();
-    }
-
-    function ingresarCliente() {
-      limpiarError();
-      const nombre = document.getElementById('nombreInput').value.trim();
-      if (!nombre) {
-        mostrarError('Por favor, ingresá tu nombre.');
-        return;
-      }
-      localStorage.setItem('nombreCliente', nombre);
-      localStorage.setItem('rol', 'cliente');
-      localStorage.setItem('modo', 'cliente');
-      window.location.href = "index.html";
-    }
-
-    function validarEmail(email) {
-      return /\S+@\S+\.\S+/.test(email);
-    }
-
-    function loginAdmin() {
-      limpiarError();
-      const email = document.getElementById('emailInput').value.trim();
-      const pass = document.getElementById('passInput').value.trim();
-
-      if (!email || !pass) {
-        mostrarError('Por favor, completá ambos campos.');
-        return;
-      }
-      if (!validarEmail(email)) {
-        mostrarError('Por favor, ingresá un correo válido.');
-        return;
-      }
-      if (email === "admin@workbreak.com" && pass === "1234") {
-        localStorage.setItem('rol', 'admin');
-        localStorage.setItem('nombreAdmin', email);
-        localStorage.setItem('modo', 'admin');
-        alert("Login exitoso.");
-        window.location.href = "index.html";
-      } else {
-        mostrarError('Credenciales incorrectas.');
-      }
-    }
-
-    // Modo oscuro
-    document.addEventListener("DOMContentLoaded", () => {
-      mostrarFormulario();
-
-      const logo = document.getElementById("logoWorkBreak");
-      logo.addEventListener("click", () => {
-        const modoActual = localStorage.getItem("modo");
-        if (modoActual === "admin") {
-          window.location.href = "index.html";
-        }
-      });
-
-      const toggleBtn = document.getElementById("toggle-dark");
-      if (!toggleBtn) return;
-
-      if (localStorage.getItem("modoOscuro") === "true") {
-        document.body.classList.add("dark-mode");
-        toggleBtn.textContent = "☀️ Modo claro";
-      } else {
-        toggleBtn.textContent = "🌙 Modo oscuro";
-      }
-
-      toggleBtn.addEventListener("click", () => {
-        document.body.classList.toggle("dark-mode");
-        const modoActual = document.body.classList.contains("dark-mode");
-        toggleBtn.textContent = modoActual ? "☀️ Modo claro" : "🌙 Modo oscuro";
-        localStorage.setItem("modoOscuro", modoActual);
-      });
-    });
-  </script>
 </body>
 </html>
-
