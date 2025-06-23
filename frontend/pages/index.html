@@ -2,281 +2,107 @@
 <html lang="es">
 
 <head>
+  <!-- Metadatos -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <!-- Título de la página -->
   <title>WorkBreak - Home</title>
+  
+  <!-- Estilos CSS -->
   <link rel="stylesheet" href="../styles/estilos.css" />
+  
+  <!-- Librería Axios para hacer peticiones HTTP -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
-<header class="header">
-  <img src="../img/logo.png" alt="Logo Workbreak" class="logo" />
-  <h1 class="titulo">WorkBreak</h1>
-  <nav class="nav-derecha">
-    <a href="bienvenido.html" class="admin-btn">Ingresar como admin</a>
-    <button id="toggle-dark" class="admin-btn">🌙 Modo oscuro</button>
-    <a href="carrito.html" class="admin-btn carrito-btn">🛒</a>
-  </nav>
-</header>
+  <!-- Encabezado principal -->
+  <header class="header">
+    <!-- Logo -->
+    <img src="../img/logo.png" alt="Logo Workbreak" class="logo" />
+    <!-- Título -->
+    <h1 class="titulo">WorkBreak</h1>
+    <!-- Navegación derecha -->
+    <nav class="nav-derecha">
+      <a href="bienvenido.html" class="admin-btn">Ingresar como admin</a>
+      <button id="toggle-dark" class="admin-btn">🌙 Modo oscuro</button>
+      <a href="carrito.html" class="admin-btn carrito-btn">🛒</a>
+    </nav>
+  </header>
 
-<main class="main-content">
-  <!-- Filters Section -->
-  <section class="filters">
-    <h3>Filtrar por:</h3>
-    <div class="filter-row">
-      <div class="filter-item active" data-filter="todos">Todos</div>
-      <div class="filter-item" data-filter="alojamiento">Alojamiento</div>
-      <div class="filter-item" data-filter="restaurantes">Restaurantes</div>
-      <div class="filter-item" data-filter="autos">Autos</div>
-      <div class="filter-item" data-filter="vuelos">Vuelos</div>
-      <div class="filter-item" data-filter="paquetes">Paquetes</div>
-    </div>
-  </section>
+  <!-- Contenido principal -->
+  <main class="main-content">
+    
+    <!-- Sección de filtros -->
+    <section class="filters">
+      <h3>Filtrar por:</h3>
+      <div class="filter-row">
+        <div class="filter-item active" data-filter="todos">Todos</div>
+        <div class="filter-item" data-filter="alojamiento">Alojamiento</div>
+        <div class="filter-item" data-filter="restaurantes">Restaurantes</div>
+        <div class="filter-item" data-filter="autos">Autos</div>
+        <div class="filter-item" data-filter="vuelos">Vuelos</div>
+        <div class="filter-item" data-filter="paquetes">Paquetes</div>
+      </div>
+    </section>
 
-  <!-- Productos -->
-  <section class="workspaces-grid" id="workspacesGrid">
-    <!-- Aquí se insertan los productos dinámicamente -->
-  </section>
+    <!-- Sección donde se muestran los productos dinámicamente -->
+    <section class="workspaces-grid" id="workspacesGrid">
+      <!-- Aquí se insertan los productos -->
+    </section>
 
-  <!-- Botón agregar producto solo admin -->
-  <section id="admin-section" style="margin-top: 2rem; display:none;">
-    <button id="btnAgregarProducto" class="btn btn-success">+ Agregar Producto</button>
-  </section>
+    <!-- Sección para botón de agregar producto visible solo para admin -->
+    <section id="admin-section" style="margin-top: 2rem; display:none;">
+      <button id="btnAgregarProducto" class="btn btn-success">+ Agregar Producto</button>
+    </section>
 
-  <!-- Modal agregar/modificar producto -->
-  <div id="modalAgregar" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index: 9999;">
-    <div style="background:white; padding:1.5rem; border-radius:8px; width: 90%; max-width: 400px; position: relative;">
-      <h2 id="modalTitulo">Agregar producto</h2>
-      <form id="formAgregarProducto" novalidate>
-        <input type="hidden" id="productoId" />
-        <label for="nombreProd">Nombre</label>
-        <input id="nombreProd" type="text" required />
-        <label for="descripcionProd">Descripción</label>
-        <textarea id="descripcionProd" required></textarea>
-        <label for="precioProd">Precio</label>
-        <input id="precioProd" type="number" min="0" step="0.01" required />
-        <label for="categoriaProd">Categoría</label>
-        <select id="categoriaProd" required>
-          <option value="">Seleccionar...</option>
-          <option value="alojamiento">Alojamiento</option>
-          <option value="restaurantes">Restaurantes</option>
-          <option value="autos">Autos</option>
-          <option value="vuelos">Vuelos</option>
-          <option value="paquetes">Paquetes</option>
-        </select>
-        <div style="margin-top: 1rem;">
-          <button type="submit" class="btn btn-primary">Guardar</button>
-          <button type="button" id="btnCancelarAgregar" class="btn btn-secondary">Cancelar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</main>
-
-<script>
-  // Leemos el rol del localStorage
-  let rol = localStorage.getItem("rol") || "cliente";
-
-  const adminSection = document.getElementById("admin-section");
-  const modalAgregar = document.getElementById("modalAgregar");
-  const formAgregar = document.getElementById("formAgregarProducto");
-  const btnCancelarAgregar = document.getElementById("btnCancelarAgregar");
-  const modalTitulo = document.getElementById("modalTitulo");
-  const workspacesGrid = document.getElementById("workspacesGrid");
-
-  // Array de productos inicial
-  let productos = [
-    { id: 1, nombre: "Sala de Estudio Central", descripcion: "Microcentro, Buenos Aires", precio: 4200, categoria: "alojamiento" },
-    { id: 2, nombre: "CoWork Recoleta", descripcion: "Recoleta, Buenos Aires", precio: 9800, categoria: "alojamiento" },
-    { id: 3, nombre: "Sala Conferencias Madero", descripcion: "Puerto Madero, Buenos Aires", precio: 21500, categoria: "alojamiento" },
-    { id: 4, nombre: "WorkSpot Retiro", descripcion: "Retiro, Buenos Aires", precio: 7650, categoria: "alojamiento" }
-  ];
-
-  function generarId() {
-    return productos.length ? Math.max(...productos.map(p => p.id)) + 1 : 1;
-  }
-
-  function renderProductos(filtro = "todos") {
-    workspacesGrid.innerHTML = "";
-    productos.forEach(p => {
-      if (filtro === "todos" || p.categoria === filtro) {
-        const div = document.createElement("div");
-        div.className = "workspace-card";
-        div.dataset.category = p.categoria;
-        div.dataset.id = p.id;
-
-        div.innerHTML = `
-          <div class="workspace-image"></div>
-          <div class="workspace-info">
-            <h3 class="workspace-name">${p.nombre}</h3>
-            <div class="workspace-location">📍 ${p.descripcion}</div>
+    <!-- Modal para agregar o modificar producto -->
+    <div id="modalAgregar" 
+         style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); 
+                justify-content:center; align-items:center; z-index: 9999;">
+      <div style="background:white; padding:1.5rem; border-radius:8px; width: 90%; max-width: 400px; position: relative;">
+        <h2 id="modalTitulo">Agregar producto</h2>
+        <form id="formAgregarProducto" novalidate>
+          <!-- Campo oculto para ID en edición -->
+          <input type="hidden" id="productoId" />
+          
+          <!-- Campo Nombre -->
+          <label for="nombreProd">Nombre</label>
+          <input id="nombreProd" type="text" required />
+          
+          <!-- Campo Descripción -->
+          <label for="descripcionProd">Descripción</label>
+          <textarea id="descripcionProd" required></textarea>
+          
+          <!-- Campo Precio -->
+          <label for="precioProd">Precio</label>
+          <input id="precioProd" type="number" min="0" step="0.01" required />
+          
+          <!-- Selector Categoría -->
+          <label for="categoriaProd">Categoría</label>
+          <select id="categoriaProd" required>
+            <option value="">Seleccionar...</option>
+            <option value="alojamiento">Alojamiento</option>
+            <option value="restaurantes">Restaurantes</option>
+            <option value="autos">Autos</option>
+            <option value="vuelos">Vuelos</option>
+            <option value="paquetes">Paquetes</option>
+          </select>
+          
+          <!-- Botones Guardar y Cancelar -->
+          <div style="margin-top: 1rem;">
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <button type="button" id="btnCancelarAgregar" class="btn btn-secondary">Cancelar</button>
           </div>
-          <div class="workspace-price">
-            <div class="price-current">ARS ${p.precio.toFixed(2)}</div>
-            ${rol === "admin" ? `
-              <button class="btn btn-warning btn-sm btnEditar" data-id="${p.id}">Editar</button>
-              <button class="btn btn-danger btn-sm btnEliminar" data-id="${p.id}">Eliminar</button>
-            ` : `
-              <button class="book-btn" data-id="${p.id}">Reservar</button>
-            `}
-            <button class="info-btn" data-id="${p.id}">Información</button>
-          </div>
-        `;
-        workspacesGrid.appendChild(div);
-      }
-    });
-    asignarEventos();
-  }
+        </form>
+      </div>
+    </div>
+    
+  </main>
 
-  function asignarEventos() {
-    document.querySelectorAll(".info-btn").forEach(btn => {
-      btn.onclick = () => {
-        window.location.href = "detalle.html?id=" + btn.dataset.id;
-      };
-    });
-
-    if (rol === "admin") {
-      document.querySelectorAll(".btnEditar").forEach(btn => {
-        btn.onclick = () => {
-          const id = parseInt(btn.dataset.id);
-          const prod = productos.find(p => p.id === id);
-          if (!prod) return alert("Producto no encontrado");
-          abrirModalEditar(prod);
-        };
-      });
-
-      document.querySelectorAll(".btnEliminar").forEach(btn => {
-        btn.onclick = () => {
-          const id = parseInt(btn.dataset.id);
-          if (confirm("¿Querés eliminar este producto?")) {
-            productos = productos.filter(p => p.id !== id);
-            renderProductos(getFiltroActivo());
-          }
-        };
-      });
-    } else {
-      document.querySelectorAll(".book-btn").forEach(btn => {
-        btn.onclick = () => {
-          const id = parseInt(btn.dataset.id);
-          const producto = productos.find(p => p.id === id);
-          if (!producto) return alert("Producto no encontrado");
-
-          // Guardar producto en carrito en localStorage
-          let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-
-          // Evitar duplicados (opcional)
-          const existe = carrito.find(item => item.id === producto.id);
-          if (existe) {
-            alert("Este producto ya está en tu carrito");
-            return;
-          }
-
-          carrito.push(producto);
-          localStorage.setItem("carrito", JSON.stringify(carrito));
-          alert(`"${producto.nombre}" agregado al carrito.`);
-        };
-      });
-    }
-  }
-
-  function mostrarPanelSegunRol() {
-    if (rol === "admin") {
-      adminSection.style.display = "block";
-    } else {
-      adminSection.style.display = "none";
-    }
-    renderProductos(getFiltroActivo());
-  }
-
-  document.getElementById("btnAgregarProducto").onclick = () => {
-    abrirModalAgregar();
-  };
-
-  function abrirModalAgregar() {
-    modalTitulo.textContent = "Agregar producto";
-    formAgregar.reset();
-    document.getElementById("productoId").value = "";
-    modalAgregar.style.display = "flex";
-  }
-
-  function abrirModalEditar(prod) {
-    modalTitulo.textContent = "Editar producto";
-    document.getElementById("productoId").value = prod.id;
-    document.getElementById("nombreProd").value = prod.nombre;
-    document.getElementById("descripcionProd").value = prod.descripcion;
-    document.getElementById("precioProd").value = prod.precio;
-    document.getElementById("categoriaProd").value = prod.categoria;
-    modalAgregar.style.display = "flex";
-  }
-
-  btnCancelarAgregar.onclick = () => {
-    modalAgregar.style.display = "none";
-  };
-
-  formAgregar.onsubmit = (e) => {
-    e.preventDefault();
-
-    const id = document.getElementById("productoId").value;
-    const nombre = document.getElementById("nombreProd").value.trim();
-    const descripcion = document.getElementById("descripcionProd").value.trim();
-    const precio = parseFloat(document.getElementById("precioProd").value);
-    const categoria = document.getElementById("categoriaProd").value;
-
-    if (!nombre || !descripcion || isNaN(precio) || !categoria) {
-      alert("Complete todos los campos correctamente.");
-      return;
-    }
-
-    if (id) {
-      const prodIndex = productos.findIndex(p => p.id === parseInt(id));
-      if (prodIndex >= 0) {
-        productos[prodIndex] = { id: parseInt(id), nombre, descripcion, precio, categoria };
-      }
-    } else {
-      productos.push({ id: generarId(), nombre, descripcion, precio, categoria });
-    }
-
-    modalAgregar.style.display = "none";
-    renderProductos(getFiltroActivo());
-  };
-
-  function getFiltroActivo() {
-    const filtro = document.querySelector(".filter-item.active");
-    return filtro ? filtro.dataset.filter : "todos";
-  }
-
-  document.querySelectorAll(".filter-item").forEach(filtro => {
-    filtro.onclick = () => {
-      document.querySelectorAll(".filter-item").forEach(f => f.classList.remove("active"));
-      filtro.classList.add("active");
-      renderProductos(filtro.dataset.filter);
-    };
-  });
-
-  mostrarPanelSegunRol();
-
-  // Modo oscuro
-  document.addEventListener("DOMContentLoaded", () => {
-    const toggleBtn = document.getElementById("toggle-dark");
-    if (!toggleBtn) return;
-
-    // Carga estado guardado en localStorage (si hay)
-    if (localStorage.getItem("modoOscuro") === "true") {
-      document.body.classList.add("dark-mode");
-      toggleBtn.textContent = "☀️ Modo claro";
-    } else {
-      toggleBtn.textContent = "🌙 Modo oscuro";
-    }
-
-    // Evento para alternar modo oscuro y guardar estado
-    toggleBtn.addEventListener("click", () => {
-      document.body.classList.toggle("dark-mode");
-      const modoActual = document.body.classList.contains("dark-mode");
-      toggleBtn.textContent = modoActual ? "☀️ Modo claro" : "🌙 Modo oscuro";
-      localStorage.setItem("modoOscuro", modoActual);
-    });
-  });
-</script>
-
+  <!-- Script JS principal que controla la lógica-->
+  <script src="../funciones.js"></script>
 </body>
+
 </html>

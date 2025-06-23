@@ -31,10 +31,32 @@
       margin-bottom: 1rem;
       text-align: center;
     }
+    /* Para centrar solo el contenido (formulario), no el header */
+    main {
+      min-height: calc(100vh - 70px); /* ajusta según altura header */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      background-color: #f8f9fa; /* similar a bg-light */
+    }
   </style>
 </head>
-<body class="bg-light d-flex align-items-center justify-content-center vh-100">
+<body class="bg-light">
 
+  <!-- Header arriba -->
+  <header class="header">
+  <img src="../img/logo.png" alt="Logo Workbreak" class="logo" />
+  <h1 class="titulo">WorkBreak</h1>
+  <nav class="nav-derecha">
+    <a href="bienvenido.html" class="admin-btn">Ingresar como admin</a>
+    <button id="toggle-dark" class="admin-btn">🌙 Modo oscuro</button>
+    <a href="carrito.html" class="admin-btn carrito-btn">🛒</a>
+  </nav>
+</header>
+
+
+  <!-- Logo móvil arriba a la izquierda -->
   <div class="position-absolute top-0 start-0 m-4">
     <img
       src="../img/Celular.png"
@@ -47,9 +69,10 @@
     />
   </div>
 
+  <!-- Contenido centrado (formulario) -->
   <main>
     <section id="formulario" class="card p-5 shadow bienvenidos" style="max-width: 400px; width: 100%;">
-      <!-- Aquí va el formulario -->
+      <!-- Aquí va el formulario o mensaje -->
     </section>
   </main>
 
@@ -149,6 +172,7 @@
       }
     }
 
+    // Modo oscuro
     document.addEventListener("DOMContentLoaded", () => {
       mostrarFormulario();
 
@@ -159,8 +183,25 @@
           window.location.href = "index.html";
         }
       });
+
+      const toggleBtn = document.getElementById("toggle-dark");
+      if (!toggleBtn) return;
+
+      if (localStorage.getItem("modoOscuro") === "true") {
+        document.body.classList.add("dark-mode");
+        toggleBtn.textContent = "☀️ Modo claro";
+      } else {
+        toggleBtn.textContent = "🌙 Modo oscuro";
+      }
+
+      toggleBtn.addEventListener("click", () => {
+        document.body.classList.toggle("dark-mode");
+        const modoActual = document.body.classList.contains("dark-mode");
+        toggleBtn.textContent = modoActual ? "☀️ Modo claro" : "🌙 Modo oscuro";
+        localStorage.setItem("modoOscuro", modoActual);
+      });
     });
   </script>
-
 </body>
 </html>
+

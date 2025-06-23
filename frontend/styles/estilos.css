@@ -673,21 +673,7 @@ nav {
     height: 300px;
     border: 0;
 }
-/* ------------------------------------
-   Modo Oscuro y Modo Claro
------------------------------------- */
 
-/* ==========================
-   Estilos generales para modo oscuro
-   ========================== */
-body.dark-mode {
-  background-color: #1e1e1e; /* gris muy oscuro, no negro puro */
-  color: #ddd; /* texto claro, no blanco puro */
-}
-
-body.dark-mode .main-content {
-  background-color: #2a2a2a; /* fondo principal un poco más claro */
-}
 
 /* ==========================
    Tarjetas workspace-card
@@ -842,33 +828,7 @@ body.dark-mode .modal-close {
   margin-bottom: 10px;
 }
 
-/* ==========================
-   Hero Section en modo oscuro
-   ========================== */
-body.dark-mode .hero {
-  background-color: #1e1e1e;
-  color: #e0e0e0;
-  padding: 40px 24px;
-  border-radius: 16px;
-  margin-bottom: 32px;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
 
-body.dark-mode .hero h1 {
-  color: #4ADE80; /* Verde suave */
-  font-weight: 800;
-  margin-bottom: 16px;
-  font-size: 2.2rem;
-}
-
-body.dark-mode .hero p {
-  color: #cccccc;
-  font-size: 1.15rem;
-  line-height: 1.6;
-  margin-bottom: 24px;
-  max-width: 700px;
-}
 
 
 /* ==========================
@@ -933,20 +893,6 @@ body.dark-mode .hero .search-form .search-btn {
 body.dark-mode .hero .search-form .search-btn:hover {
   background-color: #1E40AF;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /* ---------------------------
@@ -1284,8 +1230,6 @@ body {
 
 
 
-
-
 /* Modal (fondo y centrado) */
 #modalAgregar {
   display: none; /* se muestra con JS */
@@ -1397,33 +1341,22 @@ body {
 
 
 
-/* ------------------------------------
-   Hero / Bienvenida
------------------------------------- */
-.hero {
-    background: linear-gradient(135deg, #ff6b35, #f7931e);
-    padding: 3rem 0;
-    color: white;
-}
 
-.hero-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 2rem;
-    text-align: center;
-}
 
-.hero h1 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    font-weight: 700;
-}
+
+
+
+
+
+/* ----------------------------- */
 
 .hero p {
     font-size: 1.2rem;
     margin-bottom: 2rem;
     opacity: 0.9;
 }
+
+/* ----------------------------- */
 
 .bienvenidos {
     background-color: white;
@@ -1436,7 +1369,8 @@ body {
     box-sizing: border-box;
 }
 
-/* Título y textos */
+/* ----------------------------- */
+
 .bienvenidos h2 {
     color: #ff6b35;
     font-weight: 700;
@@ -1450,7 +1384,8 @@ body {
     margin-bottom: 2rem;
 }
 
-/* Botones */
+/* ----------------------------- */
+
 .bienvenidos .btn-primary {
     background-color: #ff6b35;
     border-color: #ff6b35;
@@ -1472,59 +1407,108 @@ body {
     border-color: #ff6b35;
 }
 
-/* Contenedor flex para formulario e imagen */
+/* ----------------------------- */
+
 .bienvenidos .formulario-y-logo {
-  display: flex;
-  align-items: stretch; 
-  justify-content: center;
-  gap: 2rem;
-  flex-wrap: wrap;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
 }
 
-/* Formulario */
+/* ----------------------------- */
+
 .bienvenidos .formulario-y-logo form {
-  max-width: 450px;
-  flex: 1 1 300px;
-  font-size: 1.1rem;
-  box-sizing: border-box;
-
-  /* Centrar contenido dentro del formulario vertical y horizontalmente */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+    max-width: 450px;
+    flex: 1 1 300px;
+    font-size: 1.1rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
-/* Inputs, selects, textarea */
+/* ----------------------------- */
+
 .bienvenidos .formulario-y-logo form input,
 .bienvenidos .formulario-y-logo form select,
 .bienvenidos .formulario-y-logo form textarea {
-  font-size: 1.1rem;
-  padding: 0.5rem 0.75rem;
-  margin-bottom: 1rem;
+    font-size: 1.1rem;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 1rem;
 }
 
-/* Botón */
+/* ----------------------------- */
+
 .bienvenidos .formulario-y-logo form button {
-  font-size: 1.1rem;
-  padding: 0.6rem 1.2rem;
-  cursor: pointer;
+    font-size: 1.1rem;
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
 }
+
+/* ----------------------------- */
 
 #logoWorkBreak {
-  width: auto;
-  height: 100%;
-  max-width: 450px;
-  cursor: pointer;
-  transition: transform 0.2s;
-  user-select: none;
-  flex-shrink: 0;
-  object-fit: contain;
-  position: relative;
-  right: -100px;
-  top: 110px;
+    width: auto;
+    height: 100%;           
+    max-width: 450px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    user-select: none;
+    flex-shrink: 0;
+    object-fit: contain;
+    position: relative;
+    right: -100px;
+    top: 200px;             /* lo subí de 110px a 160px para bajarlo más */
 }
 
 
 #logoWorkBreak:hover {
-  transform: scale(1.1);
+    transform: scale(1.1);
+}
+
+/* ----------------------------- */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ==========================
+   Estilos generales para modo oscuro
+   ========================== */
+body.dark-mode {
+  background-color: #1e1e1e !important;
+  color: #ddd !important;
+}
+
+body.dark-mode .main-content,
+body.dark-mode .contenedor,
+body.dark-mode .admin-btn,
+body.dark-mode header {
+  background-color: #2a2a2a !important;
+  color: #ddd !important;
+}
+
+body.dark-mode .card,
+body.dark-mode .card-body {
+  background-color: #333 !important;
+  color: #eee !important;
+}
+
+body.dark-mode .btn,
+body.dark-mode input,
+body.dark-mode select {
+  background-color: #444 !important;
+  color: #fff !important;
+  border-color: #666 !important;
 }
