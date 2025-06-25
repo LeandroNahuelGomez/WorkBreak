@@ -1,28 +1,44 @@
-//External Import
+
+// EXTERNAL IMPORTS
 const express = require("express");
 const morgan = require("morgan");
 require("dotenv").config();
-const cors = require('cors'); // Importa cors
+const cors = require("cors");
+const path = require("path");
 
-//Local Import
-const {sequelize, testConnection} = require("./src/config/db.config");
+// LOCAL IMPORTS
+const { sequelize, testConnection } = require("./src/config/db.config");
 const mainRouter = require("./src/routes/mainRoutes");
+const { checkAuth, checkRole } = require("./src/middlewares/authMiddleware");
 
 
-//Start express
+// EXPRESS APP
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-//Middlewares
+// MIDDLEWARES
+app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
-app.use(cors()); // Esto permite todas las conexiones CORS (útil en desarrollo)
 
+// Vistas (si usás EJS)
+app.set("views", path.join(__dirname, "src", "views"));
+app.set("view engine", "ejs");
 
-//Rutas
-app.use(mainRouter);
+// ROUTES
+app.use("/", mainRouter);
 
+app.get("/dashboard-admin", (req, res) => {
+  res.render("dashboard-admin", { user: req.user });
+});
 
-app.listen(3000, () => {
-    console.log("Servidor corriendo en puerto 3000")
-})
+// SERVER START
+app.listen(PORT, async () => {
+  try {
+    await testConnection();
+    console.log("✅ DB conectada correctamente");
+    console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  } catch (error) {
+    console.error("❌ Error al conectar a la base de datos:", error.message);
+  }
+});

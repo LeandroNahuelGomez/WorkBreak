@@ -1,20 +1,11 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
+const usuarioController = require('../controllers/usuarioController');
+const { checkAuth, checkRole } = require('../middlewares/authMiddleware');
 
-// Importo funciones del controlador
-const {
-  obtenerUsuarios,
-  obtenerUsuarioPorId,
-  crearUsuario,
-  actualizarUsuario,
-  eliminarUsuario,
-} = require("../controllers/usuarioController.js"); 
-
-// Rutas RESTful
-router.get("/", obtenerUsuarios);             // GET todos
-router.get("/:id", obtenerUsuarioPorId);     // GET uno por ID
-router.post("/", crearUsuario);               // POST (crear)
-router.put("/:id", actualizarUsuario);       // PUT (editar)
-router.delete("/:id", eliminarUsuario);      // DELETE (eliminar)
+router.get('/', usuarioController.obtenerUsuarios);
+router.get('/:id', usuarioController.obtenerUsuarioPorId);
+router.put('/:id', usuarioController.actualizarUsuario);
+router.delete('/:id',  usuarioController.eliminarUsuario);
 
 module.exports = router;
