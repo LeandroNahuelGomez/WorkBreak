@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro</title>
+  <style>
+    /* Reutilizamos los mismos estilos del login */
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f3f4f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      max-width: 400px;
+      width: 100%;
+      transition: transform 0.3s ease;
+    }
+
+    .header {
+      background: linear-gradient(to right, #3730a3, #4338ca);
+      padding: 2rem;
+      text-align: center;
+      color: white;
+    }
+
+    .header svg {
+      width: 3rem;
+      height: 3rem;
+      fill: white;
+      margin-bottom: 0.5rem;
+    }
+
+    .header h1 {
+      font-size: 1.875rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+
+    .form {
+      padding: 2rem;
+    }
+
+    .form label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #4b5563;
+    }
+
+    .form input[type="text"],
+    .form input[type="email"],
+    .form input[type="password"],
+    .form input[type="tel"] {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.5rem;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .form input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .form button {
+      margin-top: 1.5rem;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .form button:hover {
+      background-color: #1d4ed8;
+      transform: scale(1.02);
+    }
+
+    .form button:disabled {
+      background-color: #cbd5e1;
+      cursor: not-allowed;
+    }
+
+    .forgot {
+      margin-top: 1rem;
+      text-align: center;
+    }
+
+    .forgot a {
+      color: #3730a3;
+      text-decoration: none;
+      font-size: 0.875rem;
+    }
+
+    .forgot a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="header">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      <h1>Regístrate</h1>
+      <p>Crea tu cuenta</p>
+    </div>
+    <form class="form" id="registerForm">
+      <label for="name">Nombre</label>
+      <input type="text" id="name" placeholder="Tu nombre" />
+
+      <label for="lastName">Apellido</label>
+      <input type="text" id="lastName" placeholder="Tu apellido" />
+
+      <label for="email">Correo electrónico</label>
+      <input type="email" id="email" placeholder="tu@email.com" />
+
+      <label for="password">Contraseña</label>
+      <input type="password" id="password" placeholder="••••••••" />
+
+      <label for="phone">Teléfono</label>
+      <input type="tel" id="phone" placeholder="+56 9 1234 5678" />
+
+      <button type="submit" id="registerBtn" disabled>Registrarse</button>
+
+      <div class="forgot">
+        <a href="login.html">¿Ya tienes cuenta? Inicia sesión</a>
+      </div>
+    </form>
+  </div>
+  <script src="../js/api.js"></script>
+  <script>
+    const nameInput = document.getElementById("name");
+    const lastNameInput = document.getElementById("lastName");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const phoneInput = document.getElementById("phone");
+    const registerBtn = document.getElementById("registerBtn");
+
+    function validateRegisterForm() {
+      const name = nameInput.value.trim();
+      const lastName = lastNameInput.value.trim();
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      const phone = phoneInput.value.trim();
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      registerBtn.disabled = !(name && lastName && emailRegex.test(email) && password.length >= 6 && phone);
+    }
+
+    [nameInput, lastNameInput, emailInput, passwordInput, phoneInput].forEach(input => {
+      input.addEventListener("input", validateRegisterForm);
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = nameInput.value.trim();
+      const lastName = lastNameInput.value.trim();
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      const phone = phoneInput.value.trim();
+      
+      try {
+        const response = await apiClient.fetchAPI('auth/register', {
+          method: "POST",
+          body: JSON.stringify({
+            nombre: name,
+            apellido: lastName,
+            email: email,
+            contraseña: password,
+            telefono: phone
+          })
+        });
+
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error');
+      }
+    });
+
+  </script>
+
+</body>
+
+</html>

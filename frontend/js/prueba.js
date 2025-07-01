@@ -1,6 +1,6 @@
 document.getElementById('getUsers').addEventListener('click', async () => {
     try {
-        const users = await apiClient.fetchAPI('usuario');
+        const users = await apiClient.fetchAPI('usuarios');
         console.log('Usuarios:', users);
         alert('Datos obtenidos! Revisa la consola');
     } catch (error) {
@@ -11,7 +11,7 @@ document.getElementById('getUsers').addEventListener('click', async () => {
 
 document.getElementById('createUser').addEventListener('click', async () => {
     try {
-        const newUser = await apiClient.fetchAPI('usuario', {
+        const newUser = await apiClient.fetchAPI('usuarios', {
             method: 'POST',
             body: JSON.stringify({ name: 'John Doe' })
         });
