@@ -4,7 +4,6 @@ const { sequelize } = require("../config/db.config")
 const Producto = require("../models/producto.model")(sequelize, DataTypes);
 
 
-
 const obtenerProductos = async (req, res) => {
   try {
     const productos = await Producto.findAll();
@@ -83,7 +82,6 @@ const eliminarProducto = async (req, res) => {
   await producto.destroy();
   res.json({ mensaje: "Eliminado" });
 };
-
 
 module.exports = {
     obtenerProductos,

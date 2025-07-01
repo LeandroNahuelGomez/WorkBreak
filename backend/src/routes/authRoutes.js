@@ -3,7 +3,7 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 const { validateSchema, loginRateLimiter } = require('../middlewares/validators');
 const { checkAuth, checkRole } = require('../middlewares/authMiddleware');
-const { loginSchema, registerSchema } = require('../schemas/authSchemas');
+const {loginEmpleadoSchema, loginAdminSchema, registerSchema } = require('../schemas/authSchemas');
 
 /**
  * @swagger
@@ -26,10 +26,17 @@ const { loginSchema, registerSchema } = require('../schemas/authSchemas');
  *         description: Demasiados intentos
  */
 router.post(
+  '/login-empleado',
+  loginRateLimiter,
+  validateSchema(loginEmpleadoSchema),
+  authController.loginEmpleado
+);
+
+router.post(
   '/login-admin',
   loginRateLimiter,
-  validateSchema(loginSchema),
-  authController.loginEmpleado
+  validateSchema(loginAdminSchema),
+  authController.loginAdmin
 );
 
 /**

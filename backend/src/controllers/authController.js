@@ -74,6 +74,52 @@ const loginEmpleado = async (req, res) => {
   }
 };
 
+const loginAdmin = async (req, res) => {
+  try {
+    const { nombre, apellido, email, password } = req.body;
+
+    const user = await Usuario.findOne({ where: { nombre, apellido, email } });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'Credenciales inválidas',
+        code: 'INVALID_CREDENTIALS'
+      });
+    }
+
+    const isValid = await bcrypt.compare(password, user.contrasena_hash);
+    if (!isValid) {
+      return res.status(401).json({
+        success: false,
+        error: 'Contraseña incorrecta',
+        code: 'INVALID_PASSWORD'
+      });
+    }
+
+    const token = generarToken(user.usuario_id);
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: user.usuario_id,
+        nombre: user.nombre,
+        apellido: user.apellido,
+        email: user.email,
+        rol_id: user.rol_id // El frontend puede usar esto para redirigir
+      }
+    });
+  } catch (error) {
+    console.error('Error en loginAdmin:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error interno del servidor',
+      code: 'SERVER_ERROR'
+    });
+  }
+};
+
 /**
  * Controlador para registrar nuevos usuarios
  * @async
@@ -142,5 +188,6 @@ const register = async (req, res) => {
 
 module.exports = {
   loginEmpleado,
+  loginAdmin,
   register
 };
