@@ -54,9 +54,21 @@ router.post(
  */
 router.post(
   '/register',
+  loginRateLimiter,
   validateSchema(registerSchema),
   authController.register
 );
 
+
+router.post(
+  '/logout',
+  checkAuth,
+  (req, res) => {
+    res.json({
+      success: true,
+      message: 'Logout exitoso. Elimina el token del cliente.'
+    });
+  }
+);
 
 module.exports = router;

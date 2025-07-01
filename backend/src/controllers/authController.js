@@ -32,9 +32,9 @@ const generarToken = (userId) => {
  */
 const loginEmpleado = async (req, res) => {
   try {
-    const { nombre, apellido, email, password } = req.body;
+    const { email, password } = req.body;
 
-    const user = await Usuario.findOne({ where: { email, nombre, apellido } });
+    const user = await Usuario.findOne({ where: { email } });
 
     if (!user) {
       return res.status(404).json({
@@ -61,8 +61,6 @@ const loginEmpleado = async (req, res) => {
       user: {
         id: user.usuario_id,
         email: user.email,
-        nombre: user.nombre,
-        apellido: user.apellido,
         rol_id: user.rol_id // El frontend puede usar esto para redirigir
       }
     });
@@ -87,6 +85,16 @@ const loginEmpleado = async (req, res) => {
 const register = async (req, res) => {
   try {
     const { email, contraseña , nombre, apellido, telefono } = req.body;
+
+    // Verificar si el email ya existe
+    const existingUser = await Usuario.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        error: 'El email ya está registrado',
+        code: 'EMAIL_EXISTS'
+      });
+    }
 
     const hashedPassword = await bcrypt.hash(contraseña, SALT_ROUNDS);
 
