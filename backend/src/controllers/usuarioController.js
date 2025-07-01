@@ -1,8 +1,6 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { loginRateLimiter, validateSchema} = require('../middlewares/validators');
-const { DataTypes, Op } = require("sequelize");
+const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/db.config");
+
 const Usuario = require("../models/usuario.model")(sequelize, DataTypes);
 
 const obtenerUsuarios = async (req, res) => {
@@ -24,6 +22,7 @@ const obtenerUsuarioPorId = async (req, res) => {
     res.status(500).json({ error: 'Error al buscar usuario', detalle: error.message });
   }
 };
+
 
 const actualizarUsuario = async (req, res) => {
   try {

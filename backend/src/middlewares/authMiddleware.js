@@ -25,13 +25,15 @@ const checkAuth = async (req, res, next) => {
   try {
     // Paso 1: Extraer el token del header Authorization
     // El formato esperado es: "Bearer <token>"
+    //Ese ?. se llama "Optional chaining" (encadenamiento opcional). Permite acceder a una propiedad solo si existe. Si authorization no está definido, en lugar de tirar un error, devuelve undefined.
     const token = req.headers.authorization?.split(' ')[1];
 
     // Paso 2: Verificar si el token existe
     if (!token) {
       return res.status(401).json({
         error: 'Acceso no autorizado',
-        details: "Token no proporcionado en el encabezado Authorization"
+        details: "Token no proporcionado en el encabezado Authorization",
+        code: "MISSING_TOKEN"
       });
     }
     // Paso 3: Verificar y decodificar el token JWT
@@ -72,11 +74,38 @@ const checkAuth = async (req, res, next) => {
   }
 };
 
-// const checkRole = (role) => (req, res, next) => {
-//   if (req.user?.rol !== role) {
-//     return res.status(403).json({ error: 'Acceso prohibido' });
-//   }
-//   next();
-// };
+const checkRole = (allowedRoles) => (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ 
+        success: false,
+        error: 'Usuario no autenticado',
+        code: 'NOT_AUTHENTICATED'
+      });
+    }
 
-module.exports = { checkAuth };
+    // Convierte a array si es un solo rol
+    const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
+    
+    if (!roles.includes(req.user.rol_id)) {
+      return res.status(403).json({ 
+        success: false,
+        error: 'Acceso prohibido - Rol insuficiente',
+        code: 'INSUFFICIENT_ROLE',
+        requiredRoles: roles,
+        userRole: req.user.rol_id
+      });
+    }
+    
+    next();
+  } catch (error) {
+    console.error('Error en checkRole:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error interno del servidor',
+      code: 'SERVER_ERROR'
+    });
+  }
+};
+
+module.exports = { checkAuth, checkRole };

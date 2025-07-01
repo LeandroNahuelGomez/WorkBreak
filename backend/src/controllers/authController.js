@@ -32,9 +32,9 @@ const generarToken = (userId) => {
  */
 const loginEmpleado = async (req, res) => {
   try {
-    const { nombre, apellido, email, password } = req.body;
+    const { email, password } = req.body;
 
-    const user = await Usuario.findOne({ where: { email, nombre, apellido } });
+    const user = await Usuario.findOne({ where: { email } });
 
     if (!user) {
       return res.status(404).json({
@@ -61,13 +61,57 @@ const loginEmpleado = async (req, res) => {
       user: {
         id: user.usuario_id,
         email: user.email,
-        nombre: user.nombre,
-        apellido: user.apellido,
         rol_id: user.rol_id // El frontend puede usar esto para redirigir
       }
     });
   } catch (error) {
     console.error('Error en loginEmpleado:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error interno del servidor',
+      code: 'SERVER_ERROR'
+    });
+  }
+};
+
+const loginAdmin = async (req, res) => {
+  try {
+    const { nombre, apellido, email, password } = req.body;
+
+    const user = await Usuario.findOne({ where: { nombre, apellido, email } });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'Credenciales inválidas',
+        code: 'INVALID_CREDENTIALS'
+      });
+    }
+
+    const isValid = await bcrypt.compare(password, user.contrasena_hash);
+    if (!isValid) {
+      return res.status(401).json({
+        success: false,
+        error: 'Contraseña incorrecta',
+        code: 'INVALID_PASSWORD'
+      });
+    }
+
+    const token = generarToken(user.usuario_id);
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: user.usuario_id,
+        nombre: user.nombre,
+        apellido: user.apellido,
+        email: user.email,
+        rol_id: user.rol_id // El frontend puede usar esto para redirigir
+      }
+    });
+  } catch (error) {
+    console.error('Error en loginAdmin:', error);
     res.status(500).json({
       success: false,
       error: 'Error interno del servidor',
@@ -87,6 +131,16 @@ const loginEmpleado = async (req, res) => {
 const register = async (req, res) => {
   try {
     const { email, contraseña , nombre, apellido, telefono } = req.body;
+
+    // Verificar si el email ya existe
+    const existingUser = await Usuario.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        error: 'El email ya está registrado',
+        code: 'EMAIL_EXISTS'
+      });
+    }
 
     const hashedPassword = await bcrypt.hash(contraseña, SALT_ROUNDS);
 
@@ -134,5 +188,6 @@ const register = async (req, res) => {
 
 module.exports = {
   loginEmpleado,
+  loginAdmin,
   register
 };
