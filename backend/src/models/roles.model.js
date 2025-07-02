@@ -1,6 +1,4 @@
-const { DataTypes } = require("sequelize")
-const { sequelize } = require("../config/db.config")
-
+module.exports = (sequelize, DataTypes) => {
 const Roles = sequelize.define('Roles', {
   rol_id: {
     type: DataTypes.INTEGER,
@@ -17,4 +15,5 @@ const Roles = sequelize.define('Roles', {
   timestamps: false
 });
 
-module.exports = Roles;
+return Roles;
+};

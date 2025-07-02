@@ -1,18 +1,17 @@
-const { DataTypes } = require("sequelize")
+const { DataTypes, Op } = require("sequelize")
 const { sequelize } = require("../config/db.config")
 
 const Producto = require("../models/producto.model")(sequelize, DataTypes);
 
 
-const obtenerProducto = async (req, res) => {
-    try {
-        const productos = await Producto.findAll();
-        res.json(productos);
-    } catch (error) {
-        res.status(400).json({ error: "Error al obtener productos" })
-    }
+const obtenerProductos = async (req, res) => {
+  try {
+    const productos = await Producto.findAll();
+    res.json(productos);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener productos', detalle: error.message });
+  }
 };
-
 
 const obtenerProductoPorId = async (req, res) => {
     try {
@@ -29,7 +28,7 @@ const crearProducto = async (req, res) => {
 
     try {
         const nuevoProducto = await Producto.create(userData);
-        res.status(201).json(nuevoUsuario);
+        res.status(201).json(nuevoProducto);
     } catch (error) {
         console.error("Error al crear producto:", error); // Muestra todo el error en consola
 
@@ -85,7 +84,7 @@ const eliminarProducto = async (req, res) => {
 };
 
 module.exports = {
-    obtenerProducto,
+    obtenerProductos,
     obtenerProductoPorId,
     crearProducto,
     actualizarProducto,
