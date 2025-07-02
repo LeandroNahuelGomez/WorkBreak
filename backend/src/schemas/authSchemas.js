@@ -130,12 +130,39 @@ const rolSchema = z.object({
 });
 
 
+const productoSchema = z.object({
+  tipo_producto_id: z.number({
+    required_error: "tipo_producto_id es obligatorio"
+  }).int(),
+  usuario_id: z.number({
+    required_error: "usuario_id es obligatorio"
+  }).int(),
+  titulo: z.string({
+    required_error: "titulo es obligatorio"
+  }).max(255, {
+    message: "titulo no puede tener más de 255 caracteres"
+  }),
+  descripcion: z.string().nullable().optional(),
+  capacidad: z.number().int().optional().nullable(),
+  normas: z.string().optional().nullable(),
+  activo: z.boolean().optional().default(true),
+  precioxdia: z.number({
+    required_error: "precioxdia es obligatorio"
+  }).positive({
+    message: "precioxdia debe ser mayor a 0"
+  }).refine(val => parseFloat(val.toFixed(2)) === val, {
+    message: "precioxdia debe tener máximo 2 decimales"
+  })
+});
+
+
 module.exports = {
   loginEmpleadoSchema,
   loginAdminSchema,
   registerSchema,
   ubicacionSchema,
   rolSchema,
-  ticketSchema
+  ticketSchema,
+  productoSchema
 }
 
