@@ -5,13 +5,13 @@
   <!-- Metadatos -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  
+
   <!-- Título de la página -->
   <title>WorkBreak - Home</title>
-  
+
   <!-- Estilos CSS -->
   <link rel="stylesheet" href="../styles/estilos.css" />
-  
+
   <!-- Librería Axios para hacer peticiones HTTP -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
@@ -33,7 +33,7 @@
 
   <!-- Contenido principal -->
   <main class="main-content">
-    
+
     <!-- Sección de filtros -->
     <section class="filters">
       <h3>Filtrar por:</h3>
@@ -66,19 +66,19 @@
         <form id="formAgregarProducto" novalidate>
           <!-- Campo oculto para ID en edición -->
           <input type="hidden" id="productoId" />
-          
+
           <!-- Campo Nombre -->
           <label for="nombreProd">Nombre</label>
           <input id="nombreProd" type="text" required />
-          
+
           <!-- Campo Descripción -->
           <label for="descripcionProd">Descripción</label>
           <textarea id="descripcionProd" required></textarea>
-          
+
           <!-- Campo Precio -->
           <label for="precioProd">Precio</label>
           <input id="precioProd" type="number" min="0" step="0.01" required />
-          
+
           <!-- Selector Categoría -->
           <label for="categoriaProd">Categoría</label>
           <select id="categoriaProd" required>
@@ -89,7 +89,7 @@
             <option value="vuelos">Vuelos</option>
             <option value="paquetes">Paquetes</option>
           </select>
-          
+
           <!-- Botones Guardar y Cancelar -->
           <div style="margin-top: 1rem;">
             <button type="submit" class="btn btn-primary">Guardar</button>
@@ -98,11 +98,11 @@
         </form>
       </div>
     </div>
-    
+
   </main>
 
   <!-- Script JS principal que controla la lógica-->
-  <script src="../funciones.js"></script>
+  <script type="module" src="../funciones.js"></script>
 </body>
 
 </html>

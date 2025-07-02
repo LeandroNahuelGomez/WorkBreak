@@ -1,6 +1,6 @@
 const API_BASE_URL = 'http://localhost:3000/api/v1/';
 
-const apiClient = {
+export const apiClient = {
     async fetchAPI(endpoint, options = {}) {
         try {
             const fullUrl = `${API_BASE_URL}${endpoint}`;
@@ -33,4 +33,4 @@ const apiClient = {
             throw new Error(`Error al conectar con el API: ${error.message}`);
         }
     }
-}
+};
