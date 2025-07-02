@@ -28,10 +28,6 @@ app.set("view engine", "ejs");
 // ROUTES
 app.use("/", mainRouter);
 
-app.get("/dashboard-admin", (req, res) => {
-  res.render("dashboard-admin", { user: req.user });
-});
-
 // SERVER START
 app.listen(PORT, async () => {
   try {
