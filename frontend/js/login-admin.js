@@ -1,6 +1,3 @@
-
-import { apiClient, API_BASE_URL } from './api.js';
-
 //Traemos los inputs
 const nameInput = document.getElementById("name");
 const lastNameInput = document.getElementById("lastName");
@@ -28,7 +25,6 @@ function validateForm() {
 // Single submit handler
 document.getElementById('adminForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    alert("Inicio de sesión exitoso\nNombre: " + nameInput.value + "\nApellido: " + lastNameInput.value + "\nEmail: " + emailInput.value);
 
     const name = nameInput.value.trim();
     const lastName = lastNameInput.value.trim();
@@ -49,8 +45,8 @@ document.getElementById('adminForm').addEventListener('submit', async (e) => {
             })
         });
 
-        // Guarda el token en localStorage
-        localStorage.setItem('authToken', response.token);
+        // Guarda el token en localStorage (debe ser 'token' para que el dashboard lo lea)
+        localStorage.setItem('token', response.token);
         localStorage.setItem('userRole', 'admin');
 
         // ✅ Redirige al dashboard admin

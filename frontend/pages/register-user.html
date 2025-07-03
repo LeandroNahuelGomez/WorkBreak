@@ -204,10 +204,22 @@
             telefono: phone
           })
         });
-
+        // Limpiar los campos del formulario
+        nameInput.value = '';
+        lastNameInput.value = '';
+        emailInput.value = '';
+        passwordInput.value = '';
+        phoneInput.value = '';
+        registerBtn.disabled = true;
+        // Redireccionar al dashboard de usuario
+        window.location.href = 'dashboard-user.html';
       } catch (error) {
         console.error('Error:', error);
-        alert('Error');
+        if (error.message.includes('409')) {
+          alert('El correo electrónico ya está registrado.');
+        } else {
+          alert('Error al registrar usuario.');
+        }
       }
     });
 

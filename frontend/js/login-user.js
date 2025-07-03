@@ -1,10 +1,10 @@
-
 const nameInput = document.getElementById("userName");
 const continueBtn = document.getElementById("continueBtn");
 
 nameInput.addEventListener("input", () => {
     continueBtn.disabled = !nameInput.value.trim();
 });
+
 
 document.getElementById("userForm").addEventListener("submit", (e) => {
     e.preventDefault();

@@ -1,9 +1,9 @@
-export const API_BASE_URL = 'http://localhost:3000/api/v1/';
+window.API_BASE_URL = 'http://localhost:3000/api/v1/';
 
-export const apiClient = {
+window.apiClient = {
     async fetchAPI(endpoint, options = {}) {
         try {
-            const fullUrl = `${API_BASE_URL}${endpoint}`;
+            const fullUrl = `${window.API_BASE_URL}${endpoint}`;
             console.log(`Enviando petición a: ${fullUrl}`); // Log para depuración
             
             const response = await fetch(fullUrl, {

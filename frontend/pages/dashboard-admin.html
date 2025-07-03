@@ -1,748 +1,382 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pluto Dashboard</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            width: 280px;
-            background: linear-gradient(135deg, #2c3e50, #34495e);
-            color: white;
-            padding: 0;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            padding: 25px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .user-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #3498db, #2980b9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            font-weight: bold;
-            margin-right: 15px;
-        }
-
-        .user-info h3 {
-            font-size: 16px;
-            margin-bottom: 4px;
-        }
-
-        .user-status {
-            font-size: 12px;
-            color: #2ecc71;
-            display: flex;
-            align-items: center;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background: #2ecc71;
-            border-radius: 50%;
-            margin-right: 6px;
-        }
-
-        .nav-section {
-            padding: 20px 0;
-        }
-
-        .nav-section h4 {
-            padding: 0 20px 15px;
-            font-size: 14px;
-            color: #bdc3c7;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .nav-menu {
-            list-style: none;
-        }
-
-        .nav-item {
-            margin-bottom: 2px;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 12px 20px;
-            color: #ecf0f1;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border-left: 3px solid transparent;
-        }
-
-        .nav-link:hover {
-            background: rgba(255,255,255,0.1);
-            border-left-color: #3498db;
-        }
-
-        .nav-link.active {
-            background: rgba(255,255,255,0.15);
-            border-left-color: #e74c3c;
-        }
-
-        .nav-icon {
-            width: 20px;
-            height: 20px;
-            margin-right: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 0;
-        }
-
-        .header {
-            background: white;
-            padding: 20px 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-
-        .logo::before {
-            content: "🌌";
-            margin-right: 10px;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .notification-icon {
-            position: relative;
-            width: 40px;
-            height: 40px;
-            background: #ecf0f1;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .notification-icon:hover {
-            background: #3498db;
-            color: white;
-        }
-
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #e74c3c;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .content-area {
-            padding: 30px;
-        }
-
-        .page-title {
-            font-size: 28px;
-            color: #2c3e50;
-            margin-bottom: 30px;
-            font-weight: 300;
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-
-        .metric-card {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .metric-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-        }
-
-        .metric-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: white;
-        }
-
-        .metric-value {
-            font-size: 32px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 8px;
-        }
-
-        .metric-label {
-            color: #7f8c8d;
-            font-size: 16px;
-        }
-
-        .social-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-
-        .social-card {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-            transition: transform 0.3s ease;
-        }
-
-        .social-card:hover {
-            transform: translateY(-3px);
-        }
-
-        .social-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 25px;
-        }
-
-        .social-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            color: white;
-        }
-
-        .facebook { background: #3b5998; }
-        .twitter { background: #1da1f2; }
-        .linkedin { background: #0077b5; }
-        .google { background: #dd4b39; }
-
-        .social-stats {
-            display: flex;
-            justify-content: space-between;
-            text-align: center;
-        }
-
-        .stat-item h3 {
-            font-size: 24px;
-            color: #2c3e50;
-            margin-bottom: 5px;
-        }
-
-        .stat-item p {
-            color: #7f8c8d;
-            font-size: 14px;
-        }
-
-        .chart-section {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-        }
-
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .chart-title {
-            font-size: 20px;
-            color: #2c3e50;
-            font-weight: 600;
-        }
-
-        .chart-legend {
-            display: flex;
-            gap: 20px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            color: #7f8c8d;
-        }
-
-        .legend-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 2px;
-        }
-
-        .chart-container {
-            height: 300px;
-            position: relative;
-            background: #f8f9fa;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .chart-canvas {
-            width: 100%;
-            height: 100%;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 70px;
-            }
-            
-            .user-info, .nav-section h4 {
-                display: none;
-            }
-            
-            .nav-link {
-                justify-content: center;
-                padding: 15px;
-            }
-            
-            .nav-icon {
-                margin: 0;
-            }
-            
-            .metrics-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .social-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Workbreak</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 </head>
-<body>
-    <div class="sidebar">
-        <div class="user-profile">
-            <div class="user-avatar">JD</div>
-            <div class="user-info">
-                <h3>John David</h3>
-                <div class="user-status">
-                    <div class="status-dot"></div>
-                    Online
-                </div>
+
+<body class="bg-light">
+
+    <div class="container py-4">
+        <!-- Header con logo y avatar -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3">Workbreak Dashboard Admin</h1>
+            <div class="d-flex align-items-center">
+                <span class="me-3" id="name-admin"></span>
+                <div class="rounded-circle bg-primary text-white text-center"
+                    style="width: 40px; height: 40px; line-height: 40px;" id="initials-name"></div>
             </div>
         </div>
 
-        <div class="nav-section">
-            <h4>General</h4>
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="#" class="nav-link active">
-                        <div class="nav-icon">🏠</div>
-                        Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <div class="nav-icon">🔧</div>
-                        Widgets
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <div class="nav-icon">💎</div>
-                        Elements
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <div class="nav-icon">📊</div>
-                        Tables
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <div class="nav-icon">📱</div>
-                        Apps
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <div class="nav-icon">💰</div>
-                        Pricing Tables
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <div class="nav-icon">📧</div>
-                        Contact
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <div class="nav-icon">📄</div>
-                        Additional Pages
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <div class="nav-icon">🗺️</div>
-                        Map
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <div class="nav-icon">📈</div>
-                        Charts
-                    </a>
-                </li>
-            </ul>
+        <!-- Tabs -->
+        <ul class="nav nav-tabs mb-3" id="dashboardTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="inicio-tab" data-bs-toggle="tab" data-bs-target="#inicio"
+                    type="button" role="tab">
+                    <i class="bi bi-house-door me-1"></i> Dashboard
+                </button>
+            </li>
+
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="empleados-tab" data-bs-toggle="tab" data-bs-target="#empleados"
+                    type="button" role="tab">
+                    <i class="bi bi-people me-1"></i> Empleados
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="productos-tab" data-bs-toggle="tab" data-bs-target="#productos"
+                    type="button" role="tab">
+                    <i class="bi bi-box-seam me-1"></i> Productos
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="auditorias-tab" data-bs-toggle="tab" data-bs-target="#auditorias"
+                    type="button" role="tab">
+                    <i class="bi bi-clipboard-check me-1"></i> Auditorías
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="reservas-tab" data-bs-toggle="tab" data-bs-target="#reservas" type="button"
+                    role="tab">
+                    <i class="bi bi-calendar-check me-1"></i> Reservas
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tickets-tab" data-bs-toggle="tab" data-bs-target="#tickets" type="button"
+                    role="tab">
+                    <i class="bi bi-receipt-cutoff me-1"></i> Tickets
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="contactos-tab" data-bs-toggle="tab" data-bs-target="#contactos"
+                    type="button" role="tab">
+                    <i class="bi bi-envelope me-1"></i> Contactos
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="analiticas-tab" data-bs-toggle="tab" data-bs-target="#analiticas"
+                    type="button" role="tab">
+                    <i class="bi bi-bar-chart-line me-1"></i> Analíticas
+                </button>
+            </li>
+        </ul>
+
+        <!-- Contenido de pestañas -->
+        <div class="tab-content" id="dashboardTabsContent">
+            <section class="card shadow-sm mt-4 mb-3 rounded-3">
+                <div class="card-body text-center">
+                    <h3 class="card-title mb-0">Leandro Gomez</h3>
+                    <h4 class="card-subtitle text-muted">Parcial Programacion III</h4>
+                </div>
+            </section>
+            <!-- Inicio -->
+            <div class="tab-pane fade show active" id="inicio" role="tabpanel">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <div class="fs-1 text-warning">👥</div>
+                                <h5 class="card-title" id="count-empleados"></h5>
+                                <p class="card-text">Empleados</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <div class="fs-1 text-primary">⏰</div>
+                                <h5 class="card-title" id="count-productos"></h5>
+                                <p class="card-text">Productos</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <div class="fs-1 text-success">⬇️</div>
+                                <h5 class="card-title" id="count-reservas"></h5>
+                                <p class="card-text">Reservas</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <div class="fs-1 text-danger">💬</div>
+                                <h5 class="card-title"></h5>
+                                <p class="card-text">Reseñas</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="mt-4">Redes Sociales</h5>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-header bg-primary text-white">Facebook</div>
+                            <div class="card-body">
+                                <p><strong>35k</strong> Friends</p>
+                                <p><strong>128</strong> Feeds</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-header bg-info text-white">Twitter</div>
+                            <div class="card-body">
+                                <p><strong>584k</strong> Followers</p>
+                                <p><strong>978</strong> Tweets</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-header bg-secondary text-white">LinkedIn</div>
+                            <div class="card-body">
+                                <p><strong>758+</strong> Contacts</p>
+                                <p><strong>365</strong> Feeds</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resto de secciones -->
+            <div class="tab-pane fade" id="empleados" role="tabpanel" aria-labelledby="empleados-tab">
+                <section class="card mt-3">
+                    <div class="card-header bg-success text-white">
+                        <h3 class="mb-0"><i class="bi bi-list-ul me-2"></i>Listado de Empleados</h3>
+                    </div>
+                    <div class="card-body" id="divListadoEmpleados">
+                        <!-- Contenedor dinámico para la tabla de empleados -->
+                        <div class="table-responsive">
+                            <!-- Spinner de carga (se reemplaza por datos) -->
+                            <div class="d-flex justify-content-center my-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Cargando...</span>
+                                </div>
+                            </div>
+
+                            <!-- Ejemplo de tabla oculta hasta que se cargue -->
+                            <table class="table table-hover d-none" id="tablaEmpleados">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Apellido</th>
+                                        <th>Email</th>
+                                        <th>Rol</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Aquí se insertan filas dinámicamente con JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+                <!-- Card para editar usuario (inicialmente oculta) -->
+                <div id="cardEditarUsuario" class="card mt-4 d-none">
+                    <div class="card-header bg-primary text-white">
+                        Editar Usuario
+                    </div>
+                    <form id="formEditarUsuario">
+                        <div class="card-body">
+                            <!-- ✅ CORREGIDO: ID único y atributo name -->
+                            <input type="hidden" id="editar-id" name="editar-id">
+                            <div class="mb-3">
+                                <label for="editar-nombre" class="form-label">Nombre</label>
+                                <!-- ✅ CORREGIDO: ID único y atributo name -->
+                                <input type="text" class="form-control" id="editar-nombre" name="editar-nombre" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editar-apellido" class="form-label">Apellido</label>
+                                <!-- ✅ CORREGIDO: ID único y atributo name -->
+                                <input type="text" class="form-control" id="editar-apellido" name="editar-apellido" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editar-email" class="form-label">Email</label>
+                                <!-- ✅ CORREGIDO: ID único y atributo name -->
+                                <input type="email" class="form-control" id="editar-email" name="editar-email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editar-rol" class="form-label">Rol</label>
+                                <!-- ✅ CORREGIDO: ID único y atributo name -->
+                                <input type="text" class="form-control" id="editar-rol" name="editar-rol">
+                            </div>
+                        </div>
+                        <div class="card-footer text-end">
+                            <button type="submit" class="btn btn-success">Guardar cambios</button>
+                            <button type="button" class="btn btn-secondary" id="btnCancelarEdicionUsuario">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="productos" role="tabpanel" aria-labelledby="productos-tab">
+                <section class="card mt-3">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0"><i class="bi bi-box-seam me-2"></i>Listado de Productos</h3>
+                    </div>
+                    <div class="card-body" id="divListadoProductos">
+                        <div class="table-responsive">
+                            <!-- Spinner de carga -->
+                            <div class="d-flex justify-content-center my-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Cargando...</span>
+                                </div>
+                            </div>
+
+                            <!-- Tabla oculta (se muestra cuando se cargan los datos) -->
+                            <table class="table table-hover d-none" id="tablaProductos">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Tipo Producto</th>
+                                        <th>Titulo</th>
+                                        <th>Descripcion</th>
+                                        <th>Capacidad</th>
+                                        <th>Normas</th>
+                                        <th>Activo</th>
+                                        <th>Creacion</th>
+                                        <th>Precio x dia</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Filas generadas con JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+                <!-- Card para editar producto (inicialmente oculta) -->
+                <div id="cardEditarProducto" class="card mt-4 d-none">
+                    <div class="card-header bg-primary text-white">
+                        Editar Producto
+                    </div>
+                    <form id="formEditarProducto">
+                        <div class="card-body">
+                            <!-- ✅ CORREGIDO: ID único -->
+                            <input type="hidden" id="editar-id" name="editar-id">
+                            <div class="mb-3">
+                                <label for="editar-tipo-producto" class="form-label">Tipo producto</label>
+                                <!-- ✅ CORREGIDO: ID único -->
+                                <input type="text" class="form-control" id="editar-tipo-producto" name="editar-tipo-producto" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editar-titulo" class="form-label">Titulo</label>
+                                <!-- ✅ CORREGIDO: ID único -->
+                                <input type="text" class="form-control" id="editar-titulo" name="editar-titulo" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editar-descripcion" class="form-label">Descripcion</label>
+                                <!-- ✅ CORREGIDO: ID único -->
+                                <input type="text" class="form-control" id="editar-descripcion" name="editar-descripcion" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editar-capacidad" class="form-label">Capacidad</label>
+                                <!-- ✅ CORREGIDO: ID único -->
+                                <input type="number" class="form-control" id="editar-capacidad" name="editar-capacidad">
+                            </div>
+                            <div class="mb-3">
+                                <label for="editar-normas" class="form-label">Normas</label>
+                                <!-- ✅ CORREGIDO: ID único -->
+                                <input type="text" class="form-control" id="editar-normas" name="editar-normas">
+                            </div>
+                            <div class="mb-3">
+                                <label for="editar-activo" class="form-label">Activo</label>
+                                <!-- ✅ CORREGIDO: Cambiar type="boolean" por select -->
+                                <select class="form-control" id="editar-activo" name="editar-activo">
+                                    <option value="true">Activo</option>
+                                    <option value="false">Inactivo</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editar-precio" class="form-label">Precio por dia</label>
+                                <!-- ✅ CORREGIDO: ID único y type="number" -->
+                                <input type="number" step="0.01" class="form-control" id="editar-precio" name="editar-precio">
+                            </div>
+                        </div>
+                        <div class="card-footer text-end">
+                            <button type="submit" class="btn btn-success">Guardar cambios</button>
+                            <button type="button" class="btn btn-secondary" id="btnCancelarEdicionProducto">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="auditorias" role="tabpanel">
+                <div class="alert alert-info mt-3">Sección de auditorías en construcción...</div>
+            </div>
+            <div class="tab-pane fade" id="reservas" role="tabpanel" aria-labelledby="reservas-tab">
+                <section class="card mt-3">
+                    <div class="card-header bg-warning text-dark">
+                        <h3 class="mb-0"><i class="bi bi-list-check me-2"></i>Listado de Reservas</h3>
+                    </div>
+                    <div class="card-body" id="divListadoReservas">
+                        <!-- Contenedor dinámico para la tabla de reservas -->
+                        <div class="table-responsive">
+                            <!-- Spinner de carga (se reemplaza por datos) -->
+                            <div class="d-flex justify-content-center my-4">
+                                <div class="spinner-border text-warning" role="status">
+                                    <span class="visually-hidden">Cargando...</span>
+                                </div>
+                            </div>
+
+                            <!-- Tabla oculta hasta que se cargue -->
+                            <table class="table table-hover d-none" id="tablaReservas">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Cliente</th>
+                                        <th>Fecha</th>
+                                        <th>Hora</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Acá se insertan las reservas con JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="tab-pane fade" id="tickets" role="tabpanel">
+                <div class="alert alert-info mt-3">Sección de tickets en construcción...</div>
+            </div>
+            <div class="tab-pane fade" id="contactos" role="tabpanel">
+                <div class="alert alert-info mt-3">Sección de contactos en construcción...</div>
+            </div>
+            <div class="tab-pane fade" id="analiticas" role="tabpanel">
+                <div class="alert alert-info mt-3">Sección de analíticas en construcción...</div>
+            </div>
         </div>
     </div>
 
-    <div class="main-content">
-        <div class="header">
-            <div class="logo">Pluto</div>
-            <div class="header-right">
-                <div class="notification-icon">
-                    🔔
-                    <div class="notification-badge">2</div>
-                </div>
-                <div class="notification-icon">
-                    ❓
-                    <div class="notification-badge">3</div>
-                </div>
-                <div class="notification-icon">✉️</div>
-                <div class="user-avatar">JD</div>
-            </div>
-        </div>
-
-        <div class="content-area">
-            <h1 class="page-title">Dashboard</h1>
-
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <div class="metric-icon" style="background: #f39c12;">👥</div>
-                    <div class="metric-value">2500</div>
-                    <div class="metric-label">Welcome</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-icon" style="background: #3498db;">⏰</div>
-                    <div class="metric-value">123.50</div>
-                    <div class="metric-label">Average Time</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-icon" style="background: #1abc9c;">⬇️</div>
-                    <div class="metric-value">1,805</div>
-                    <div class="metric-label">Collections</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-icon" style="background: #e91e63;">💬</div>
-                    <div class="metric-value">54</div>
-                    <div class="metric-label">Comments</div>
-                </div>
-            </div>
-
-            <div class="social-grid">
-                <div class="social-card">
-                    <div class="social-header">
-                        <div class="social-icon facebook">f</div>
-                    </div>
-                    <div class="social-stats">
-                        <div class="stat-item">
-                            <h3>35k</h3>
-                            <p>Friends</p>
-                        </div>
-                        <div class="stat-item">
-                            <h3>128</h3>
-                            <p>Feeds</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="social-card">
-                    <div class="social-header">
-                        <div class="social-icon twitter">🐦</div>
-                    </div>
-                    <div class="social-stats">
-                        <div class="stat-item">
-                            <h3>584k</h3>
-                            <p>Followers</p>
-                        </div>
-                        <div class="stat-item">
-                            <h3>978</h3>
-                            <p>Tweets</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="social-card">
-                    <div class="social-header">
-                        <div class="social-icon linkedin">in</div>
-                    </div>
-                    <div class="social-stats">
-                        <div class="stat-item">
-                            <h3>758+</h3>
-                            <p>Contacts</p>
-                        </div>
-                        <div class="stat-item">
-                            <h3>365</h3>
-                            <p>Feeds</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="social-card">
-                    <div class="social-header">
-                        <div class="social-icon google">G+</div>
-                    </div>
-                    <div class="social-stats">
-                        <div class="stat-item">
-                            <h3>450</h3>
-                            <p>Followers</p>
-                        </div>
-                        <div class="stat-item">
-                            <h3>57</h3>
-                            <p>Circles</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="chart-section">
-                <div class="chart-header">
-                    <h2 class="chart-title">Extra Area Chart</h2>
-                    <div class="chart-legend">
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #f39c12;"></div>
-                            Dataset 1
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #1abc9c;"></div>
-                            Dataset 2
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #e74c3c;"></div>
-                            Dataset 3
-                        </div>
-                    </div>
-                </div>
-                <div class="chart-container">
-                    <canvas id="areaChart" class="chart-canvas"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Simulación de datos para el gráfico de área
-        function drawAreaChart() {
-            const canvas = document.getElementById('areaChart');
-            const ctx = canvas.getContext('2d');
-            
-            // Ajustar el canvas al contenedor
-            const container = canvas.parentElement;
-            canvas.width = container.offsetWidth;
-            canvas.height = container.offsetHeight;
-            
-            const width = canvas.width;
-            const height = canvas.height;
-            
-            // Datos de ejemplo
-            const data = [
-                { name: 'Dataset 1', color: '#f39c12', values: [20, 45, 35, 50, 40, 60, 55, 70, 65, 80] },
-                { name: 'Dataset 2', color: '#1abc9c', values: [10, 25, 30, 20, 35, 30, 45, 40, 50, 45] },
-                { name: 'Dataset 3', color: '#e74c3c', values: [5, 15, 10, 25, 20, 30, 25, 35, 30, 40] }
-            ];
-            
-            const padding = 40;
-            const chartWidth = width - 2 * padding;
-            const chartHeight = height - 2 * padding;
-            
-            // Limpiar canvas
-            ctx.clearRect(0, 0, width, height);
-            
-            // Dibujar fondo
-            ctx.fillStyle = '#f8f9fa';
-            ctx.fillRect(0, 0, width, height);
-            
-            // Dibujar grid
-            ctx.strokeStyle = '#ecf0f1';
-            ctx.lineWidth = 1;
-            
-            // Líneas horizontales
-            for (let i = 0; i <= 5; i++) {
-                const y = padding + (chartHeight / 5) * i;
-                ctx.beginPath();
-                ctx.moveTo(padding, y);
-                ctx.lineTo(width - padding, y);
-                ctx.stroke();
-            }
-            
-            // Líneas verticales
-            for (let i = 0; i <= 9; i++) {
-                const x = padding + (chartWidth / 9) * i;
-                ctx.beginPath();
-                ctx.moveTo(x, padding);
-                ctx.lineTo(x, height - padding);
-                ctx.stroke();
-            }
-            
-            // Dibujar datasets
-            data.forEach((dataset, index) => {
-                ctx.fillStyle = dataset.color + '40'; // Semi-transparente
-                ctx.strokeStyle = dataset.color;
-                ctx.lineWidth = 2;
-                
-                ctx.beginPath();
-                ctx.moveTo(padding, height - padding);
-                
-                dataset.values.forEach((value, i) => {
-                    const x = padding + (chartWidth / 9) * i;
-                    const y = height - padding - (value / 100) * chartHeight;
-                    
-                    if (i === 0) {
-                        ctx.lineTo(x, y);
-                    } else {
-                        ctx.lineTo(x, y);
-                    }
-                });
-                
-                ctx.lineTo(width - padding, height - padding);
-                ctx.closePath();
-                ctx.fill();
-                ctx.stroke();
-            });
-        }
-        
-        // Animaciones para las métricas
-        function animateMetrics() {
-            const metricValues = document.querySelectorAll('.metric-value');
-            
-            metricValues.forEach(metric => {
-                const finalValue = metric.textContent;
-                const numericValue = parseFloat(finalValue.replace(/[^0-9.]/g, ''));
-                const suffix = finalValue.replace(/[0-9.,]/g, '');
-                
-                let currentValue = 0;
-                const increment = numericValue / 50;
-                
-                const counter = setInterval(() => {
-                    currentValue += increment;
-                    
-                    if (currentValue >= numericValue) {
-                        metric.textContent = finalValue;
-                        clearInterval(counter);
-                    } else {
-                        if (numericValue > 1000) {
-                            metric.textContent = Math.floor(currentValue).toLocaleString() + suffix;
-                        } else {
-                            metric.textContent = currentValue.toFixed(2) + suffix;
-                        }
-                    }
-                }, 50);
-            });
-        }
-        
-        // Efectos hover para las cards
-        function addHoverEffects() {
-            const cards = document.querySelectorAll('.metric-card, .social-card');
-            
-            cards.forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-5px)';
-                });
-                
-                card.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                });
-            });
-        }
-        
-        // Navegación activa
-        function handleNavigation() {
-            const navLinks = document.querySelectorAll('.nav-link');
-            
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    navLinks.forEach(l => l.classList.remove('active'));
-                    this.classList.add('active');
-                });
-            });
-        }
-        
-        // Inicializar cuando la página carga
-        window.addEventListener('load', function() {
-            drawAreaChart();
-            animateMetrics();
-            addHoverEffects();
-            handleNavigation();
-        });
-        
-        // Redimensionar gráfico cuando cambia el tamaño de la ventana
-        window.addEventListener('resize', function() {
-            setTimeout(drawAreaChart, 100);
-        });
-    </script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/dashboard-admin.js"></script>
 </body>
-</html>
 
+</html>
