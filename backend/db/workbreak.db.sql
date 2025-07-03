@@ -34,7 +34,6 @@ CREATE TABLE tipo_producto (
 CREATE TABLE producto (
   producto_id INT AUTO_INCREMENT PRIMARY KEY,
   tipo_producto_id INT NOT NULL,
-  usuario_id INT NOT NULL,
   titulo VARCHAR(255) NOT NULL,
   descripcion TEXT,
   capacidad INT,
@@ -42,7 +41,6 @@ CREATE TABLE producto (
   activo BOOLEAN DEFAULT TRUE,
   fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (tipo_producto_id) REFERENCES tipo_producto(tipo_id),
-  FOREIGN KEY (usuario_id) REFERENCES usuarios(usuario_id)
 );
 
 -- Location table

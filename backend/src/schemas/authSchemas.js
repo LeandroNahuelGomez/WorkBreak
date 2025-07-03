@@ -134,9 +134,6 @@ const productoSchema = z.object({
   tipo_producto_id: z.number({
     required_error: "tipo_producto_id es obligatorio"
   }).int(),
-  usuario_id: z.number({
-    required_error: "usuario_id es obligatorio"
-  }).int(),
   titulo: z.string({
     required_error: "titulo es obligatorio"
   }).max(255, {

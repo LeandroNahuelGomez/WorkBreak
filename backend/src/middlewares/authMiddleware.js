@@ -22,6 +22,7 @@ const Usuario = require("../models/usuario.model")(sequelize, DataTypes);
  */
 
 const checkAuth = async (req, res, next) => {
+  // console.log("[checkAuth] Token recibido:", req.headers.authorization);
   try {
     // Paso 1: Extraer el token del header Authorization
     // El formato esperado es: "Bearer <token>"
@@ -75,6 +76,7 @@ const checkAuth = async (req, res, next) => {
 };
 
 const checkRole = (allowedRoles) => (req, res, next) => {
+  // console.log("[checkRole] Roles permitidos:", allowedRoles, "Rol usuario:", req.user?.rol_id);
   try {
     if (!req.user) {
       return res.status(401).json({ 

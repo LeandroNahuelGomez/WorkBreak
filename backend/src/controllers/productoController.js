@@ -69,10 +69,11 @@ const crearProducto = async (req, res) => {
 const actualizarProducto = async (req, res) => {
   const { id } = req.params;
   const datos = req.body;
+  console.log("Datos recibidos para actualizar:", datos); // <-- LOG PARA DEPURAR
   const producto = await Producto.findByPk(id);
   if (!producto) return res.status(404).json({ error: "No encontrado" });
   await producto.update(datos);
-  res.json(usuario);
+  res.json(producto);
 };
 
 const eliminarProducto = async (req, res) => {
