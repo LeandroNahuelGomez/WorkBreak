@@ -13,31 +13,41 @@
 
 ## 🎯 ¿Qué es *WorkBreak*?
 
-**WorkBreak** es una aplicación web **responsive** de autoservicio para la compra de productos digitales (🎧 _Licencias de software_ y 📚 _E-books_). Está dividida en dos partes principales:
+WorkBreak es una aplicación web responsive que combina lo mejor de un Airbnb con un marketplace digital. Ofrece un sistema de autoservicio donde los usuarios pueden:
+🏨 Reservar alojamientos (hoteles, espacios de coworking, etc.)
+🍽️ Elegir entre restaurantes y lugares para comer
 
-- 🧑‍💻 **Frontend (Cliente)**: permite al usuario comprar productos fácilmente y generar un **ticket** con su compra.
-- 🛠️ **Backend (Admin)**: incluye una **API REST** y un **panel BackOffice** para administrar productos.
+📲 Frontend (Cliente)
+--Aplicación responsive donde el usuario ingresa su nombre, navega productos por categorías y realiza compras.
+--Permite agregar/quitar productos del carrito, cambiar el tema, descargar ticket en PDF y ver solo productos activos.
 
----
+🧑‍💼 Frontend (Administrador)
+--Panel BackOffice con vistas EJS donde el admin inicia sesión, visualiza y gestiona productos.
+--Puede agregar, editar, dar de baja o reactivar productos con imágenes y ver su estado (activo/inactivo).
+
+🛠️ Backend
+--Servidor en Node.js + Express con estructura MVC, que maneja lógica, base de datos y seguridad.
+--Incluye API REST en JSON, ORM, subida de imágenes, validaciones, relaciones entre productos y ventas, y paginación.
 
 ## 🧱 Estructura del Proyecto
 WorkBreak/
 ├── backend/
-│ ├── src/
-│ │ ├── config/ ← Configuración del servidor
-│ │ ├── controllers/ ← Lógica de control
-│ │ ├── middlewares/ ← Validaciones y seguridad
-│ │ ├── models/ ← Definición de modelos Sequelize
-│ │ ├── routes/ ← Rutas de la API
-│ │ └── schemas/ ← Validaciones con Joi
-│ ├── db/ ← Base de datos
-│ └── index.js ← Servidor principal
-│
+│   ├── src/
+│   │   ├── config/         ← Configuración del servidor
+│   │   ├── controllers/    ← Lógica de control
+│   │   ├── middlewares/    ← Validaciones y seguridad
+│   │   ├── models/         ← Definición de modelos Sequelize
+│   │   ├── routes/         ← Rutas de la API
+│   │   └── schemas/        ← Validaciones con Joi
+│   ├── db/                 ← Base de datos
+│   └── index.js            ← Servidor principal
+
 ├── frontend/
-│ ├── pages/ ← Archivos HTML del cliente y admin
-│ ├── js/ ← Lógica JS (fetch, DOM)
-│ ├── styles/ ← Estilos CSS
-│ └── img/ ← Imágenes y favicons
+│   ├── pages/              ← Archivos HTML del cliente y admin y Dashboard
+│   ├── js/                 ← Lógica JS (fetch, DOM)
+│   ├── styles/             ← Estilos CSS
+│   └── img/                ← Imágenes y favicons
+
 
 
 ---
@@ -59,7 +69,7 @@ WorkBreak/
 ### 👥 Cliente
 
 - ✅ Pantalla de bienvenida con ingreso de nombre.
-- 🛍️ Vista de productos (2 categorías).
+- 🛍️ Vista de productos (2 o más categorías).
 - 🛒 Carrito dinámico: agregar, quitar y modificar cantidades.
 - 📄 Ticket final con nombre, fecha, total y productos.
 - 📥 Descargar ticket como PDF.
@@ -84,10 +94,10 @@ WorkBreak/
 ### Cliente:
 | Página | Descripción |
 |--------|-------------|
-| `bienvenido.html` | Ingreso de nombre |
-| `index.html` | Visualización de productos |
-| `carrito.html` | Vista y edición del carrito |
-| `detalle.html` | Ticket final de compra |
+| `Login-user.html | Ingreso de usuarios con nombre |
+| `Dashboard-user.html` | Visualización de productos |
+| `carrito.html` | Vista y edición del carrito (entrega de ticket una vez confirmada la compra) |
+| `detalle.html` | Informacion más detallada de productos |
 
 ### Admin:
 | Página | Descripción |
@@ -99,17 +109,33 @@ WorkBreak/
 
 ---
 
-## 🗂️ Base de Datos
+🗂️ Base de datos
+Usuarios
+id, rol_id, nombre, apellido, email, passwordHash, telefono, avatar_url, verificado, fecha_registro
 
-- **Usuarios**  
-  `id`, `nombre`, `email`, `passwordHash`, `rol`
+Roles
+rol_id, nombre
 
-- **Productos**  
-  `id`, `nombre`, `descripcion`, `precio`, `imagen`, `tipo`, `activo`
+TipoProducto
+tipo_id, nombre, icono_url
 
-- **Ventas**  
-  `id`, `nombreUsuario`, `productos[]`, `total`, `fecha`
+Productos
+id, tipo_producto_id, titulo, descripcion, capacidad, normas, activo, fecha_creacion
 
+Ubicación
+id, producto_id, pais, ciudad, direccion, codigo_postal, latitud, longitud
+
+AtributoProducto
+id, producto_id, nombre_atributo, valor, tipo_dato
+
+Reservas
+id, producto_id, fecha_inicio, fecha_fin, cantidad_personas, estado, monto_total, metodo_pago_id, fecha_reserva
+
+Tickets
+id, reserva_id, codigo_ticket, fecha_emision, estado, qr_url, detalles
+
+Auditoría
+id, usuario_id, accion, tabla_afectada, registro_id_afectado, descripcion_cambio, fecha_hora
 ---
 
 ## 🔁 Flujo de Usuario
@@ -126,7 +152,7 @@ WorkBreak/
 
 ### 🛠️ Administrador
 
-1. Ingresa usuario/contraseña.
+1. Ingresa usuario/apellido/mailcontraseña.
 2. Accede al dashboard.
 3. Agrega/modifica productos.
 4. Activa/inactiva productos.
