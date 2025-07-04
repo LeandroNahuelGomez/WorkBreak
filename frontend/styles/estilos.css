@@ -916,13 +916,22 @@ body {
   align-items: center;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   position: relative;
+  height: 100px; /* fijás una altura para que no crezca con el logo */
+  overflow: visible; /* permite que el logo sobresalga */
 }
 
-/* Logo más grande */
+/* Logo grande, pero sin que agrande el header */
 .logo {
-  height: 120px;
-  flex-shrink: 0;
+  height: 200px;
+  position: absolute;
+  left: 2rem;
+  top: 50%;
+  transform: translateY(-40%);
+  z-index: 2;
+  pointer-events: none;
 }
+
+
 
 /* Título centrado vertical y horizontalmente */
 .titulo {
@@ -1345,111 +1354,12 @@ body {
 
 
 
-/* ----------------------------- */
 
-.hero p {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-    opacity: 0.9;
-}
-
-/* ----------------------------- */
-
-.bienvenidos {
-    background-color: white;
-    border: 3px solid #ff6b35;
-    border-radius: 1rem;
-    box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
-    padding: 2rem;
-    max-width: 900px;
-    margin: 2rem auto;
-    box-sizing: border-box;
-}
-
-/* ----------------------------- */
-
-.bienvenidos h2 {
-    color: #ff6b35;
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: 1rem;
-}
-
-.bienvenidos p {
-    color: #555;
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-/* ----------------------------- */
-
-.bienvenidos .btn-primary {
-    background-color: #ff6b35;
-    border-color: #ff6b35;
-}
-
-.bienvenidos .btn-primary:hover {
-    background-color: #e05e2a;
-    border-color: #e05e2a;
-}
-
-.bienvenidos .btn-outline-secondary {
-    border-color: #ff6b35;
-    color: #ff6b35;
-}
-
-.bienvenidos .btn-outline-secondary:hover {
-    background-color: #ff6b35;
-    color: white;
-    border-color: #ff6b35;
-}
-
-/* ----------------------------- */
-
-.bienvenidos .formulario-y-logo {
-    display: flex;
-    align-items: stretch;
-    justify-content: center;
-    gap: 2rem;
-    flex-wrap: wrap;
-}
-
-/* ----------------------------- */
-
-.bienvenidos .formulario-y-logo form {
-    max-width: 450px;
-    flex: 1 1 300px;
-    font-size: 1.1rem;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-/* ----------------------------- */
-
-.bienvenidos .formulario-y-logo form input,
-.bienvenidos .formulario-y-logo form select,
-.bienvenidos .formulario-y-logo form textarea {
-    font-size: 1.1rem;
-    padding: 0.5rem 0.75rem;
-    margin-bottom: 1rem;
-}
-
-/* ----------------------------- */
-
-.bienvenidos .formulario-y-logo form button {
-    font-size: 1.1rem;
-    padding: 0.6rem 1.2rem;
-    cursor: pointer;
-}
-
-/* ----------------------------- */
 
 #logoWorkBreak {
     width: auto;
-    height: 100%;           
-    max-width: 450px;
+    height: 220px;         /* Agrandado */
+    max-width: 550px;      /* Agrandado */
     cursor: pointer;
     transition: transform 0.2s;
     user-select: none;
@@ -1457,28 +1367,15 @@ body {
     object-fit: contain;
     position: relative;
     right: -100px;
-    top: 200px;             /* lo subí de 110px a 160px para bajarlo más */
+    /* Eliminado top: 200px para que no se baje demasiado */
 }
-
 
 #logoWorkBreak:hover {
     transform: scale(1.1);
 }
 
+
 /* ----------------------------- */
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /* ==========================
    Estilos generales para modo oscuro

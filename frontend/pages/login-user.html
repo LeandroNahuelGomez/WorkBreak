@@ -2,39 +2,38 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login Usuario - Autoservicio</title>
-    <link rel="stylesheet" href="../styles/login-user.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login Usuario - Autoservicio</title>
+  <link rel="stylesheet" href="../styles/login-user.css" />
 </head>
 
-
 <body>
-    <div class="branding">
-        <img src="../img/Logo_Workbreak.png" alt="Logo de la aplicación" class="logo" />
-        <div class="app-name">WorkBreak</div>
-    </div>
+  <div class="branding">
+    <img src="../img/Logo_Workbreak.png" alt="Logo de la aplicación" class="logo" />
+    <div class="app-name">WorkBreak</div>
+  </div>
 
-    <!-- Caja blanca con formulario -->
-    <div class="login-box">
-        <h1>Bienvenido</h1>
-        <p>¿Cómo te llamás?</p>
-        <form class="form" id="userForm">
-            <label for="userName">Nombre completo</label>
-            <input type="text" id="userName" placeholder="Ejemplo: Juan Pérez" required />
-            <button type="submit" id="continueBtn" disabled>Continuar</button>
-            <div class="info">
-                Este es el primer paso para comenzar tu experiencia de autoservicio.
-            </div>
-        </form>
-    </div>
+  <!-- Caja blanca con formulario -->
+  <div class="login-box">
+    <h1>Bienvenido</h1>
+    <p>¿Cómo te llamás?</p>
+    <form class="form" id="userForm">
+      <label for="userName">Nombre completo</label>
+      <input type="text" id="userName" placeholder="Ejemplo: Juan Pérez" required />
+      <button type="submit" id="continueBtn" disabled>Continuar</button>
 
-    <script type="module" src="../js/api.js"></script>
-    <script type="module" src="../js/login-user.js"></script>
+      <div class="info">
+        Este es el primer paso para comenzar tu experiencia de autoservicio.
+      </div>
+    </form>
+  </div>
 
+  <!-- Botón administrador afuera y debajo del formulario -->
+  <a href="login-admin.html" class="admin-btn">Ingresar como administrador</a>
+
+  <script type="module" src="../js/api.js"></script>
+  <script type="module" src="../js/login-user.js"></script>
 </body>
-
-<script type="module" src="../js/api.js"></script>
-<script type="module" src="../js/login-user.js"></script>
 
 </html>

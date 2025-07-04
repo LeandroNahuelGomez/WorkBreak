@@ -1,115 +1,183 @@
+/* ------------------------ */
+/* RESET Y BASE            */
+/* ------------------------ */
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 body {
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(to right, #fbbf24, #f59e0b);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to right, #fbbf24, #f59e0b);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
 }
 
+/* ------------------------ */
+/* BRANDING (Logo + Nombre) */
+/* ------------------------ */
+
 .branding {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    /* Reduce el espacio entre logo y login-box */
+  position: relative; /* para que hijos absolutos se posicionen relativo a este */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem; /* espacio para separar del form */
+  width: 220px;
+  height: 220px; /* altura fija para que el contenedor tenga espacio */
 }
 
 .logo {
-    width: 90px;
-    height: auto;
-    filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.5));
-    margin-bottom: 0.5rem;
-    /* Controla separación entre logo y nombre */
+  width: 220px;
+  height: auto;
+  filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.4));
+  position: relative;
+  z-index: 10;
 }
 
 .app-name {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: white;
+  position: absolute;
+  bottom: 30px;       /* sube el título 20px más */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  user-select: none;
+  z-index: 20;
+  white-space: nowrap;
 }
 
 
+
+
+/* ------------------------ */
+/* CONTENEDOR DE LOGIN      */
+/* ------------------------ */
 .login-box {
-    background: white;
-    border-radius: 1rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 400px;
-    padding: 2rem;
-    text-align: center;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 450px;
+  padding: 2.5rem;
+  text-align: center;
+  margin-top: -30px; /* sube el formulario más cerca del logo */
+  position: relative;
+  z-index: 1;
 }
 
 .login-box h1 {
-    margin-bottom: 0.5rem;
-    color: #111827;
-    font-size: 1.875rem;
+  font-size: 1.875rem;
+  color: #111827;
+  margin-bottom: 0.5rem;
+  position: relative;
+  top: 0; /* sin subir el título, está dentro del formulario */
+  z-index: 2;
 }
 
 .login-box p {
-    color: #6b7280;
-    margin-bottom: 1.5rem;
+  color: #6b7280;
+  margin-bottom: 1.5rem;
 }
 
+/* ------------------------ */
+/* FORMULARIO DE USUARIO   */
+/* ------------------------ */
 .form {
-    text-align: left;
+  text-align: left;
 }
 
 .form label {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: #4b5563;
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #4b5563;
+  margin-bottom: 0.5rem;
 }
 
 .form input[type="text"] {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    outline: none;
-    transition: border-color 0.3s;
-    margin-bottom: 1rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .form input:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
+/* ------------------------ */
+/* BOTÓN CONTINUAR         */
+/* ------------------------ */
 .form button {
-    margin-top: 1rem;
-    width: 100%;
-    padding: 0.75rem 1rem;
-    font-size: 1.1rem;
-    font-weight: bold;
-    background-color: #2563eb;
-    color: white;
-    border: none;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
+  margin-top: 1rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, transform 0.2s;
 }
 
 .form button:hover {
-    background-color: #1d4ed8;
-    transform: scale(1.02);
+  background-color: #1d4ed8;
+  transform: scale(1.02);
 }
 
 .form button:disabled {
-    background-color: #cbd5e1;
-    cursor: not-allowed;
+  background-color: #cbd5e1;
+  cursor: not-allowed;
 }
 
+/* ------------------------ */
+/* BOTÓN ADMIN (link)       */
+/* ------------------------ */
+.admin-btn {
+  display: block;
+  margin: 1rem auto 0 auto;
+  width: 180px;
+  padding: 0.6rem 1.2rem;
+  text-align: center;
+  font-weight: 700;
+  background: linear-gradient(135deg, #4b5563, #374151);
+  color: #f9fafb;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 8px rgba(55, 65, 81, 0.4);
+  text-decoration: none;
+  transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+  cursor: pointer;
+  user-select: none;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.admin-btn:hover {
+  background: linear-gradient(135deg, #1f2937, #111827);
+  box-shadow: 0 6px 14px rgba(31, 41, 55, 0.7);
+  transform: scale(1.08);
+}
+
+
+
+
+/* ------------------------ */
+/* TEXTO INFORMATIVO       */
+/* ------------------------ */
 .info {
-    margin-top: 1.5rem;
-    font-size: 0.875rem;
-    color: #6b7280;
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+  text-align: center;
 }
