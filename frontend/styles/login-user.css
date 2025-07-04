@@ -5,43 +5,60 @@
 body {
     margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f3f4f6;
+    background: linear-gradient(to right, #fbbf24, #f59e0b);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
 }
 
-.container {
+.branding {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    /* Reduce el espacio entre logo y login-box */
+}
+
+.logo {
+    width: 90px;
+    height: auto;
+    filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.5));
+    margin-bottom: 0.5rem;
+    /* Controla separación entre logo y nombre */
+}
+
+.app-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+}
+
+
+.login-box {
     background: white;
     border-radius: 1rem;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    max-width: 400px;
     width: 100%;
-    transition: transform 0.3s ease;
-}
-
-.header {
-    background: linear-gradient(to right, #fbbf24, #f59e0b);
+    max-width: 400px;
     padding: 2rem;
     text-align: center;
 }
 
-.header h1 {
-    color: white;
-    font-size: 1.875rem;
-    font-weight: bold;
+.login-box h1 {
     margin-bottom: 0.5rem;
+    color: #111827;
+    font-size: 1.875rem;
 }
 
-.header p {
-    color: #fef3c7;
-    font-size: 1rem;
+.login-box p {
+    color: #6b7280;
+    margin-bottom: 1.5rem;
 }
 
 .form {
-    padding: 2rem;
+    text-align: left;
 }
 
 .form label {
@@ -59,9 +76,8 @@ body {
     border-radius: 0.5rem;
     outline: none;
     transition: border-color 0.3s;
-    margin-bottom: 1rem; /* <--- Agregado */
+    margin-bottom: 1rem;
 }
-
 
 .form input:focus {
     border-color: #3b82f6;
@@ -69,7 +85,7 @@ body {
 }
 
 .form button {
-    margin-top: 1.5rem;
+    margin-top: 1rem;
     width: 100%;
     padding: 0.75rem 1rem;
     font-size: 1.1rem;
@@ -94,7 +110,6 @@ body {
 
 .info {
     margin-top: 1.5rem;
-    text-align: center;
     font-size: 0.875rem;
     color: #6b7280;
 }

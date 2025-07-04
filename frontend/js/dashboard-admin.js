@@ -1,3 +1,21 @@
+// // Wrapper para manejar errores de autenticación
+// async function safeFetchAPI(endpoint, options = {}) {
+//     try {
+//         const response = await apiClient.fetchAPI(endpoint, options);
+//         return response;
+//     } catch (error) {
+//         // Verificar si el error es 401 (Token expirado)
+//         if (error.message.includes("401") || (error.response && error.response.status === 401)) {
+//             // Limpiar el localStorage y redirigir al login
+//             localStorage.removeItem('token');
+//             localStorage.removeItem('userRole');
+//             window.location.href = "login-admin.html";
+//             return Promise.reject(new Error("Sesión expirada, por favor inicie sesión nuevamente"));
+//         }
+//         throw error;
+//     }
+// }
+
 // Cargar empleados desde la API
 async function cargarEmpleados() {
     const tabla = document.getElementById("tablaEmpleados");
@@ -159,6 +177,14 @@ async function actualizarMetricasDashboard() {
 
     } catch (error) {
         console.error("Error al cargar métricas del dashboard:", error.message);
+
+         // Verificar si el error es 401 (Token expirado)
+        if (error.message.includes("401") || (error.response && error.response.status === 401)) {
+            // Limpiar el localStorage y redirigir al login
+            localStorage.removeItem('token');
+            localStorage.removeItem('userRole');
+            window.location.href = "login-admin.html";
+        }
     }
 }
 
