@@ -1,0 +1,73 @@
+body {
+    background-color: #fef9f0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 30px 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.ticket-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+  overflow: visible; /* ← Muy importante */
+}
+
+.ticket-container h1 {
+    color: #f59e0b;
+    margin-bottom: 25px;
+}
+
+.empresa {
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin-bottom: 25px;
+    color: #b36b00;
+}
+
+.cliente-info p,
+.producto-info p {
+    font-size: 1rem;
+    margin: 8px 0;
+}
+
+.producto-info {
+    margin-top: 30px;
+    text-align: left;
+}
+
+.producto-info h2 {
+    color: #f59e0b;
+    margin-bottom: 15px;
+}
+
+#btn-volver {
+    margin-top: 35px;
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+    border: none;
+    padding: 14px 40px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 30px;
+    cursor: pointer;
+    color: white;
+    box-shadow: 0 8px 15px rgba(245, 158, 11, 0.4);
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+#btn-volver:hover {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    box-shadow: 0 12px 20px rgba(251, 191, 36, 0.6);
+    transform: translateY(-3px);
+}
+
+#btn-volver:active {
+    transform: translateY(1px);
+    box-shadow: 0 6px 10px rgba(245, 158, 11, 0.3);
+}
+

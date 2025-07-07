@@ -17,3 +17,22 @@ document.getElementById("userForm").addEventListener("submit", (e) => {
     // Redirigir a la vista dashboard-user
     window.location.href = "../../frontend/pages/dashboard-user.html";
 });
+
+let secretClickCount = 0;
+let secretTimer;
+
+const secretBtn = document.getElementById("adminSecretBtn");
+
+secretBtn.addEventListener("click", () => {
+    secretClickCount++;
+
+    clearTimeout(secretTimer);
+
+    if (secretClickCount === 2) {
+        window.location.href = "login-admin.html";
+    } else {
+        secretTimer = setTimeout(() => {
+            secretClickCount = 0;
+        }, 1500);
+    }
+});

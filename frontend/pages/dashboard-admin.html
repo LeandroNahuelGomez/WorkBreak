@@ -190,6 +190,11 @@
                                     <!-- Aquí se insertan filas dinámicamente con JS -->
                                 </tbody>
                             </table>
+                            <div class="mb-3 text-end">
+                                <button id="btnAgregarProducto" class="btn btn-success">
+                                    <i class="bi bi-plus-circle me-1"></i> Agregar 
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -205,12 +210,14 @@
                             <div class="mb-3">
                                 <label for="editar-nombre" class="form-label">Nombre</label>
                                 <!-- ✅ CORREGIDO: ID único y atributo name -->
-                                <input type="text" class="form-control" id="editar-nombre" name="editar-nombre" required>
+                                <input type="text" class="form-control" id="editar-nombre" name="editar-nombre"
+                                    required>
                             </div>
                             <div class="mb-3">
                                 <label for="editar-apellido" class="form-label">Apellido</label>
                                 <!-- ✅ CORREGIDO: ID único y atributo name -->
-                                <input type="text" class="form-control" id="editar-apellido" name="editar-apellido" required>
+                                <input type="text" class="form-control" id="editar-apellido" name="editar-apellido"
+                                    required>
                             </div>
                             <div class="mb-3">
                                 <label for="editar-email" class="form-label">Email</label>
@@ -225,11 +232,13 @@
                         </div>
                         <div class="card-footer text-end">
                             <button type="submit" class="btn btn-success">Guardar cambios</button>
-                            <button type="button" class="btn btn-secondary" id="btnCancelarEdicionUsuario">Cancelar</button>
+                            <button type="button" class="btn btn-secondary"
+                                id="btnCancelarEdicionUsuario">Cancelar</button>
                         </div>
                     </form>
                 </div>
             </div>
+
             <div class="tab-pane fade" id="productos" role="tabpanel" aria-labelledby="productos-tab">
                 <section class="card mt-3">
                     <div class="card-header bg-primary text-white">
@@ -243,6 +252,12 @@
                                     <span class="visually-hidden">Cargando...</span>
                                 </div>
                             </div>
+                            <div id="confirmacionProducto" class="alert alert-warning d-none">
+                                <p id="confirmacionMensaje"></p>
+                                <button id="btnConfirmarAccion" class="btn btn-sm btn-warning">Confirmar</button>
+                                <button id="btnCancelarAccion" class="btn btn-sm btn-secondary">Cancelar</button>
+                            </div>
+
 
                             <!-- Tabla oculta (se muestra cuando se cargan los datos) -->
                             <table class="table table-hover d-none" id="tablaProductos">
@@ -264,6 +279,12 @@
                                     <!-- Filas generadas con JavaScript -->
                                 </tbody>
                             </table>
+                            <div class="mb-3 text-end">
+                                <button id="btnAgregarProducto" class="btn btn-success">
+                                    <i class="bi bi-plus-circle me-1"></i> Agregar producto
+                                </button>
+                            </div>
+
                         </div>
                     </div>
                 </section>
@@ -279,17 +300,20 @@
                             <div class="mb-3">
                                 <label for="editar-tipo-producto" class="form-label">Tipo producto</label>
                                 <!-- ✅ CORREGIDO: ID único -->
-                                <input type="text" class="form-control" id="editar-tipo-producto" name="editar-tipo-producto" required>
+                                <input type="text" class="form-control" id="editar-tipo-producto"
+                                    name="editar-tipo-producto" required>
                             </div>
                             <div class="mb-3">
                                 <label for="editar-titulo" class="form-label">Titulo</label>
                                 <!-- ✅ CORREGIDO: ID único -->
-                                <input type="text" class="form-control" id="editar-titulo" name="editar-titulo" required>
+                                <input type="text" class="form-control" id="editar-titulo" name="editar-titulo"
+                                    required>
                             </div>
                             <div class="mb-3">
                                 <label for="editar-descripcion" class="form-label">Descripcion</label>
                                 <!-- ✅ CORREGIDO: ID único -->
-                                <input type="text" class="form-control" id="editar-descripcion" name="editar-descripcion" required>
+                                <input type="text" class="form-control" id="editar-descripcion"
+                                    name="editar-descripcion" required>
                             </div>
                             <div class="mb-3">
                                 <label for="editar-capacidad" class="form-label">Capacidad</label>
@@ -312,65 +336,122 @@
                             <div class="mb-3">
                                 <label for="editar-precio" class="form-label">Precio por dia</label>
                                 <!-- ✅ CORREGIDO: ID único y type="number" -->
-                                <input type="number" step="0.01" class="form-control" id="editar-precio" name="editar-precio">
+                                <input type="number" step="0.01" class="form-control" id="editar-precio"
+                                    name="editar-precio">
                             </div>
                         </div>
                         <div class="card-footer text-end">
                             <button type="submit" class="btn btn-success">Guardar cambios</button>
-                            <button type="button" class="btn btn-secondary" id="btnCancelarEdicionProducto">Cancelar</button>
+                            <button type="button" class="btn btn-secondary"
+                                id="btnCancelarEdicionProducto">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- Card para agregar producto (inicialmente oculta) -->
+                <div id="cardAgregarProducto" class="card mt-4 d-none">
+                    <div class="card-header bg-primary text-white">
+                        Agregar Producto
+                    </div>
+                    <form id="formAgregarProducto">
+                        <div class="card-body">
+                            <input type="hidden" id="agregar-id" name="agregar-id">
+                            <div class="mb-3">
+                                <label for="agregar-tipo-producto" class="form-label">Tipo de producto</label>
+                                <input type="number" class="form-select" id="agregar-tipo-producto"
+                                    name="agregar-tipo-producto" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="agregar-titulo" class="form-label">Titulo</label>
+                                <!-- ✅ CORREGIDO: ID único -->
+                                <input type="text" class="form-control" id="agregar-titulo" name="agregar-titulo"
+                                    required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="agregar-descripcion" class="form-label">Descripcion</label>
+                                <!-- ✅ CORREGIDO: ID único -->
+                                <input type="text" class="form-control" id="agregar-descripcion"
+                                    name="agregar-descripcion" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="agregar-capacidad" class="form-label">Capacidad</label>
+                                <!-- ✅ CORREGIDO: ID único -->
+                                <input type="number" class="form-control" id="agregar-capacidad"
+                                    name="agregar-capacidad">
+                            </div>
+                            <div class="mb-3">
+                                <label for="agregar-normas" class="form-label">Normas</label>
+                                <!-- ✅ CORREGIDO: ID único -->
+                                <input type="text" class="form-control" id="agregar-normas" name="agregar-normas">
+                            </div>
+                            <div class="mb-3">
+                                <label for="agregar-precio" class="form-label">Precio por dia</label>
+                                <!-- ✅ CORREGIDO: ID único y type="number" -->
+                                <input type="number" step="0.01" class="form-control" id="agregar-precio"
+                                    name="agregar-precio">
+                            </div>
+                        </div>
+                        <div class="card-footer text-end">
+                            <button type="submit" class="btn btn-success">Guardar</button>
+                            <button type="button" class="btn btn-secondary"
+                                id="btnCancelarAgregarProducto">Cancelar</button>
                         </div>
                     </form>
                 </div>
             </div>
-            <div class="tab-pane fade" id="auditorias" role="tabpanel">
-                <div class="alert alert-info mt-3">Sección de auditorías en construcción...</div>
-            </div>
-            <div class="tab-pane fade" id="reservas" role="tabpanel" aria-labelledby="reservas-tab">
-                <section class="card mt-3">
-                    <div class="card-header bg-warning text-dark">
-                        <h3 class="mb-0"><i class="bi bi-list-check me-2"></i>Listado de Reservas</h3>
-                    </div>
-                    <div class="card-body" id="divListadoReservas">
-                        <!-- Contenedor dinámico para la tabla de reservas -->
-                        <div class="table-responsive">
-                            <!-- Spinner de carga (se reemplaza por datos) -->
-                            <div class="d-flex justify-content-center my-4">
-                                <div class="spinner-border text-warning" role="status">
-                                    <span class="visually-hidden">Cargando...</span>
-                                </div>
-                            </div>
-
-                            <!-- Tabla oculta hasta que se cargue -->
-                            <table class="table table-hover d-none" id="tablaReservas">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Cliente</th>
-                                        <th>Fecha</th>
-                                        <th>Hora</th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Acá se insertan las reservas con JS -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-            </div>
-
-            <div class="tab-pane fade" id="tickets" role="tabpanel">
-                <div class="alert alert-info mt-3">Sección de tickets en construcción...</div>
-            </div>
-            <div class="tab-pane fade" id="contactos" role="tabpanel">
-                <div class="alert alert-info mt-3">Sección de contactos en construcción...</div>
-            </div>
-            <div class="tab-pane fade" id="analiticas" role="tabpanel">
-                <div class="alert alert-info mt-3">Sección de analíticas en construcción...</div>
-            </div>
         </div>
+
+
+
+        <div class="tab-pane fade" id="auditorias" role="tabpanel">
+            <div class="alert alert-info mt-3">Sección de auditorías en construcción...</div>
+        </div>
+        <div class="tab-pane fade" id="reservas" role="tabpanel" aria-labelledby="reservas-tab">
+            <section class="card mt-3">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="mb-0"><i class="bi bi-list-check me-2"></i>Listado de Reservas</h3>
+                </div>
+                <div class="card-body" id="divListadoReservas">
+                    <!-- Contenedor dinámico para la tabla de reservas -->
+                    <div class="table-responsive">
+                        <!-- Spinner de carga (se reemplaza por datos) -->
+                        <div class="d-flex justify-content-center my-4">
+                            <div class="spinner-border text-warning" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </div>
+
+                        <!-- Tabla oculta hasta que se cargue -->
+                        <table class="table table-hover d-none" id="tablaReservas">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Cliente</th>
+                                    <th>Fecha</th>
+                                    <th>Hora</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Acá se insertan las reservas con JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="tab-pane fade" id="tickets" role="tabpanel">
+            <div class="alert alert-info mt-3">Sección de tickets en construcción...</div>
+        </div>
+        <div class="tab-pane fade" id="contactos" role="tabpanel">
+            <div class="alert alert-info mt-3">Sección de contactos en construcción...</div>
+        </div>
+        <div class="tab-pane fade" id="analiticas" role="tabpanel">
+            <div class="alert alert-info mt-3">Sección de analíticas en construcción...</div>
+        </div>
+    </div>
     </div>
 
     <!-- Bootstrap JS -->

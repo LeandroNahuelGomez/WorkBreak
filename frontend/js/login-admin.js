@@ -58,4 +58,36 @@ document.getElementById('adminForm').addEventListener('submit', async (e) => {
     }
 });
 
+const secretBtn = document.getElementById("adminSecretBtn");
+
+secretBtn.addEventListener("click", () => {
+        window.location.href = "login-user.html";
+});
+// Detectar doble clic en el logo
+const logo = document.querySelector("img"); // O usá un id si lo tenés: document.getElementById("logo")
+logo.addEventListener("dblclick", () => {
+    // Obtener los campos del formulario
+    const nombre = document.getElementById("name");
+    const apellido = document.getElementById("lastName");
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
+    const loginBtn = document.getElementById("loginBtn");
+
+    // Verificamos que todos existan
+    if (nombre && apellido && email && password && loginBtn) {
+        // Asignamos valores de prueba
+        nombre.value = "Lorenzo";
+        apellido.value = "Gomez";
+        email.value = "lolito@gmail.com";
+        password.value = "Lolito123_";
+
+        // Habilitamos el botón si estaba deshabilitado
+        loginBtn.disabled = false;
+    } else {
+        console.warn("❌ Uno o más campos del formulario no se encontraron");
+    }
+});
+
+
+
 validateForm();

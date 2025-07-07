@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Ticket de Compra</title>
+    <link rel="stylesheet" href="../styles/ticket.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+</head>
+
+<body>
+    <div class="ticket-container" id="ticket">
+        <h1>Ticket de Compra</h1>
+
+        <div class="empresa">WorkBreak</div>
+
+        <div class="cliente-info">
+            <p><strong>Cliente:</strong> <span id="nombre-cliente">-</span></p>
+            <p><strong>Fecha:</strong> <span id="fecha-hoy">-</span></p>
+        </div>
+
+        <div class="producto-info" id="producto-info">
+            <!-- <h2>Producto Comprado</h2>
+            <p><strong>Título:</strong> <span id="producto-titulo">-</span></p>
+            <p><strong>Fecha reserva:</strong> <span id="producto-fecha">-</span></p>
+            <p><strong>Duración:</strong> <span id="producto-duracion">-</span> hs</p>
+            <p><strong>Total a pagar:</strong> $<span id="producto-total">-</span></p> -->
+        </div>
+
+        <button id="btn-volver" class="no-imprimir">Salir</button>
+    </div>
+    <script src="../js/api.js"></script>
+    <script src="../js/ticket.js"></script>
+</body>
+
+</html>

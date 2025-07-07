@@ -1,0 +1,173 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f7f7f7;
+  color: #2c3e50;
+  padding: 2rem;
+}
+
+/* Título */
+h1 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #222;
+}
+
+/* Lista de reservas */
+#lista-reservas {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Tarjeta horizontal */
+.reserva-card {
+  display: flex;
+  justify-content: space-between;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
+  overflow: hidden;
+  padding: 20px;
+  align-items: center;
+}
+
+.reserva-card:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+/* Parte izquierda (texto) */
+.reserva-info {
+  padding: 1.5rem;
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.reserva-info h3 {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  color: #34495e;
+}
+
+.reserva-info p {
+  margin: 0.3rem 0;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+/* Parte derecha (imagen) */
+.reserva-card img {
+  width: 240px;
+  object-fit: cover;
+  height: 100%;
+}
+
+/* Pie de tarjeta: avatar + botón */
+.card-footer {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.avatar-group {
+  display: flex;
+  gap: -10px;
+}
+
+.avatar-group img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.btn-huespedes {
+  background: #e67e22;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.3s ease;
+}
+
+.btn-huespedes:hover {
+  background: #cf711c;
+}
+
+.btn-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.btn-hora,
+.btn-eliminar {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 14px;
+}
+
+.btn-hora {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.btn-hora:hover {
+  background-color: #d0d0d0;
+}
+
+.btn-eliminar {
+  background-color: #ff5c5c;
+  color: white;
+}
+
+.btn-eliminar:hover {
+  background-color: #e54848;
+}
+
+.finalizar-container {
+    margin-top: 30px;
+    text-align: center;
+}
+
+#btn-finalizar {
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 8px 15px rgba(37, 117, 252, 0.4);
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+#btn-finalizar:hover {
+    background: linear-gradient(135deg, #2575fc, #6a11cb);
+    box-shadow: 0 12px 20px rgba(37, 117, 252, 0.6);
+    transform: translateY(-3px);
+}
+
+#btn-finalizar:active {
+    transform: translateY(1px);
+    box-shadow: 0 6px 10px rgba(37, 117, 252, 0.3);
+}
+
+

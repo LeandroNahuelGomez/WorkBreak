@@ -2,105 +2,86 @@
 <html lang="es">
 
 <head>
-  <!-- Metadatos -->
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Título de la página -->
-  <title>WorkBreak - Home</title>
-
-  <!-- Estilos CSS -->
-  <link rel="stylesheet" href="../styles/estilos.css" />
-
-  <!-- Librería Axios para hacer peticiones HTTP -->
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkBreak - Espacios para trabajar y relajarse</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../styles/dashboard-user.css">
 </head>
 
 <body>
-  <!-- Encabezado principal -->
-  <header class="header">
-    <!-- Logo -->
-    <img src="../img/Logo_Workbreak.png" alt="Logo Workbreak" class="logo" />
-    <!-- Título -->
-    <h1 class="titulo">WorkBreak</h1>
-    <!-- Navegación derecha -->
-    <nav class="nav-derecha">
-      <a href="bienvenido.html" class="admin-btn">Ingresar como admin</a>
-      <button id="toggle-dark" class="admin-btn">🌙 Modo oscuro</button>
-      <a href="carrito.html" class="admin-btn carrito-btn">🛒</a>
-    </nav>
-  </header>
+    <header>
+        <nav class="navbar">
+            <div class="logo-container">
+                <img src="../img/Logo_Workbreak.png" alt="Logo WorkBreak" class="logo-img" />
+                <span class="logo-text">WorkBreak</span>
+            </div>
 
-  <!-- Contenido principal -->
-  <main class="main-content">
+            <div class="nav-links">
+                <a href="#">Inicio</a>
+                <a href="#">Sobre Nosotros</a>
+                <a href="#" id="dark-mode-toggle">Modo oscuro</a>
+                <a href="../pages/reserva.html">Mis reservas <span id="badge-reservas" class="badge">0</span> </a>
+            </div>
+        </nav>
+    </header>
 
-    <!-- Sección de filtros -->
-    <section class="filters">
-      <h3>Filtrar por:</h3>
-      <div class="filter-row">
-        <div class="filter-item active" data-filter="todos">Todos</div>
-        <div class="filter-item" data-filter="alojamiento">Espacios de trabajo</div>
-        <div class="filter-item" data-filter="restaurantes">Espacios de relax/reunion</div>
-        <div class="filter-item" data-filter="paquetes">Espacios creativos</div>
-      </div>
-    </section>
-
-    <!-- Sección donde se muestran los productos dinámicamente -->
-    <section class="workspaces-grid" id="workspacesGrid">
-      <!-- Aquí se insertan los productos -->
-    </section>
-
-    <!-- Sección para botón de agregar producto visible solo para admin -->
-    <section id="admin-section" style="margin-top: 2rem; display:none;">
-      <button id="btnAgregarProducto" class="btn btn-success">+ Agregar Producto</button>
-    </section>
-
-    <!-- Modal para agregar o modificar producto -->
-    <div id="modalAgregar" 
-         style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); 
-                justify-content:center; align-items:center; z-index: 9999;">
-      <div style="background:white; padding:1.5rem; border-radius:8px; width: 90%; max-width: 400px; position: relative;">
-        <h2 id="modalTitulo">Agregar producto</h2>
-        <form id="formAgregarProducto" novalidate>
-          <!-- Campo oculto para ID en edición -->
-          <input type="hidden" id="productoId" />
-
-          <!-- Campo Nombre -->
-          <label for="nombreProd">Nombre</label>
-          <input id="nombreProd" type="text" required />
-
-          <!-- Campo Descripción -->
-          <label for="descripcionProd">Descripción</label>
-          <textarea id="descripcionProd" required></textarea>
-
-          <!-- Campo Precio -->
-          <label for="precioProd">Precio</label>
-          <input id="precioProd" type="number" min="0" step="0.01" required />
-
-          <!-- Selector Categoría -->
-          <label for="categoriaProd">Categoría</label>
-          <select id="categoriaProd" required>
-            <option value="">Seleccionar...</option>
-            <option value="alojamiento">Alojamiento</option>
-            <option value="restaurantes">Restaurantes</option>
-            <option value="autos">Autos</option>
-            <option value="vuelos">Vuelos</option>
-            <option value="paquetes">Paquetes</option>
-          </select>
-
-          <!-- Botones Guardar y Cancelar -->
-          <div style="margin-top: 1rem;">
-            <button type="submit" class="btn btn-primary">Guardar</button>
-            <button type="button" id="btnCancelarAgregar" class="btn btn-secondary">Cancelar</button>
-          </div>
-        </form>
-      </div>
+    <div class="search-bar">
+        <div class="search-container">
+            <div class="input-icon-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" class="search-input"
+                    placeholder="Buscar espacios de trabajo, relax o creativos..." />
+            </div>
+            <button class="search-btn">Buscar</button>
+            <button class="filter-btn-open" id="abrir-filtros">Filtrar</button>
+        </div>
     </div>
 
-  </main>
-  <script src="../js/api.js"></script>
-  <!-- Script JS principal que controla la lógica-->
-  <script type="module" src="../funciones.js"></script>
+    <div class="container">
+        <h1>Espacios en Buenos Aires</h1>
+        <div class="properties-grid" id="espacios-populares"></div>
+
+        <div class="new-country">
+            <h2>Espacios en nuevos destinos</h2>
+            <div class="properties-grid" id="espacios-nuevos"></div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-links">
+            <a href="#">Acerca de WorkBreak</a>
+            <a href="#">Cómo funciona</a>
+            <a href="#">Términos y privacidad</a>
+            <a href="#">Contacto</a>
+        </div>
+        <p>© 2023 WorkBreak. Todos los derechos reservados.</p>
+    </footer>
+    <div class="filter-modal" id="modal-filtros">
+        <div class="filter-content">
+            <div class="filter-header">
+                <h2>Filtros</h2>
+                <button class="close-btn" id="cerrar-filtros">✕</button>
+            </div>
+
+            <div class="filter-section">
+                <h3>Tipo de espacio</h3>
+                <div class="filter-options">
+                    <button class="filter-type-btn" data-tipo="todos">Todos</button>
+                    <button class="filter-type-btn" data-tipo="espacio-trabajo">🧑‍💼 Coworking</button>
+                    <button class="filter-type-btn" data-tipo="espacio-relax">🧘 Relax</button>
+                    <button class="filter-type-btn" data-tipo="espacio-creativo">🎨 Creativo</button>
+                </div>
+            </div>
+
+            <div class="filter-footer">
+                <button class="apply-filter-btn" id="aplicar-filtros">Aplicar filtros</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/dashboard-user.js"></script>
 </body>
 
 </html>
