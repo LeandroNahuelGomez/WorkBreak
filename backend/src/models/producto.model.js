@@ -35,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: DataTypes.NOW
     },
     // Aquí agregamos el nuevo campo
-    precioxdia: {
+    precio_hora: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false
       // defaultValue: 0.00  // Opcional: si quieres un valor por defecto

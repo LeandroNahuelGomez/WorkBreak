@@ -84,12 +84,22 @@ CREATE TABLE reserva (
   fecha_inicio DATE NOT NULL,
   fecha_fin DATE NOT NULL,
   cantidad_personas INT,
-  estado ENUM('pendiente', 'confirmada', 'cancelada', 'completada') DEFAULT 'pendiente',
   monto_total DECIMAL(10,2),
-  metodo_pago_id INT,
   fecha_reserva DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (producto_id) REFERENCES producto(producto_id)
 );
+
+-- 1. Primero agregamos la nueva columna dia_reserva
+ALTER TABLE reserva ADD COLUMN dia_reserva DATE;
+
+-- 2. Actualizamos la nueva columna con valores basados en fecha_inicio (asumiendo que contiene la fecha)
+UPDATE reserva SET dia_reserva = DATE(fecha_inicio);
+
+-- 3. Renombramos y cambiamos el tipo de las columnas de fecha a hora
+ALTER TABLE reserva 
+CHANGE COLUMN fecha_inicio hora_llegada TIME,
+CHANGE COLUMN fecha_fin hora_salida TIME,
+CHANGE COLUMN fecha_reserva registro_fecha_reserva DATETIME;
 
 -- Ticket table
 CREATE TABLE ticket (

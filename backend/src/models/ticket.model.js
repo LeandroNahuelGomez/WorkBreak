@@ -9,11 +9,6 @@ const Ticket = sequelize.define('Ticket', {
     type: DataTypes.INTEGER,
     allowNull: false
   },
-  codigo_ticket: {
-    type: DataTypes.STRING(20),
-    allowNull: false,
-    unique: true
-  },
   fecha_emision: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW
@@ -25,7 +20,7 @@ const Ticket = sequelize.define('Ticket', {
   qr_url: {
     type: DataTypes.STRING(255)
   },
-  detalles: {
+  nombre_usuario: {
     type: DataTypes.TEXT
   }
 }, {

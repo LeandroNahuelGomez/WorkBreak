@@ -6,7 +6,7 @@ const Producto = require("../models/producto.model")(sequelize, DataTypes);
 
 const obtenerProductos = async (req, res) => {
   try {
-    const productos = await Producto.findAll();
+    const productos = await Producto.findAll({ where: { activo: true } });
     res.json(productos);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtener productos', detalle: error.message });

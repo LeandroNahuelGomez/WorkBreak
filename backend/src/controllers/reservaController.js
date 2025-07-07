@@ -1,43 +1,43 @@
 const { DataTypes } = require("sequelize")
 const { sequelize } = require("../config/db.config")
-const { ticketSchema } = require('../schemas/authSchemas'); // Asegúrate de que la ruta sea correcta
+const { reservaSchema } = require('../schemas/authSchemas'); // Asegúrate de que la ruta sea correcta
 const { z } = require('zod'); // <-- Añade esta línea
 
-const Ticket = require("../models/ticket.model")(sequelize, DataTypes);
+const Reserva = require("../models/reserva.model")(sequelize, DataTypes);
 
 
-const obtenerTickets = async (req, res) => {
+const obtenerReservas = async (req, res) => {
   try {
-    const tickets = await Ticket.findAll();
-    res.json(tickets);
+    const reservas = await Reserva.findAll();
+    res.json(reservas);
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener tickets', detalle: error.message });
+    res.status(500).json({ error: 'Error al obtener las reservas', detalle: error.message });
   }
 };
 
-const obtenerTicketPorId = async (req, res) => {
+const obtenerReservaPorId = async (req, res) => {
     try {
         const { id } = req.params;
-        const ticketId = await Ticket.findByPk(id);
-        res.json(ticketId);
+        const reservaId = await Reserva.findByPk(id);
+        res.json(reservaId);
     } catch (error) {
-        res.status(400).json({ error: "Error al obtener la ticket" })
+        res.status(400).json({ error: "Error al obtener la reserva" })
     }
 };
 
-const crearTicket = async (req, res) => {
+const crearReserva = async (req, res) => {
     const userData = req.body;
 
     try {
         // Validar los datos con Zod
-        const validatedData = ticketSchema.parse(userData);
+        const validatedData = reservaSchema.parse(userData);
 
         // Crear la ubicación con los datos validados
-        const nuevoTicket = await Ticket.create(validatedData);
+        const nuevaReserva = await Reserva.create(validatedData);
 
-        res.status(201).json(nuevoTicket);
+        res.status(201).json(nuevaReserva);
     } catch (error) {
-        console.error("Error al crear Ticket:", error); // Muestra todo el error en consola
+        console.error("Error al crear la Reserva:", error); // Muestra todo el error en consola
 
          // Manejo de errores de Zod (validación)
         if (error instanceof z.ZodError) {
@@ -78,33 +78,33 @@ const crearTicket = async (req, res) => {
 
         // Otros errores generales
         return res.status(500).json({
-            error: "No se pudo crear el Ticket",
+            error: "No se pudo crear la reserva",
             detalle: error.message || "Error desconocido"
         });
     }
 };
 
-const actualizarTicket = async (req, res) => {
+const actualizarReserva = async (req, res) => {
   const { id } = req.params;
   const datos = req.body;
-  const ticket = await Ticket.findByPk(id);
-  if (!ticket) return res.status(404).json({ error: "No encontrado" });
-  await ticket.update(datos);
-  res.json(ticket);
+  const reserva = await Reserva.findByPk(id);
+  if (!reserva) return res.status(404).json({ error: "No encontrado" });
+  await reserva.update(datos);
+  res.json(reserva);
 };
 
-const eliminarTicket = async (req, res) => {
+const eliminarReserva = async (req, res) => {
   const { id } = req.params;
-  const ticket = await Ticket.findByPk(id);
-  if (!ticket) return res.status(404).json({ error: "No encontrado" });
-  await ticket.destroy();
+  const reserva = await Reserva.findByPk(id);
+  if (!reserva) return res.status(404).json({ error: "No encontrado" });
+  await reserva.destroy();
   res.json({ mensaje: "Eliminado" });
 };
 
 module.exports = {
-    obtenerTickets, 
-    obtenerTicketPorId,
-    crearTicket,
-    actualizarTicket,
-    eliminarTicket
+    obtenerReservas,
+    obtenerReservaPorId,
+    crearReserva,
+    actualizarReserva,
+    eliminarReserva
 };

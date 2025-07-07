@@ -1,43 +1,42 @@
 const { DataTypes } = require("sequelize")
 const { sequelize } = require("../config/db.config")
-const { ticketSchema } = require('../schemas/authSchemas'); // Asegúrate de que la ruta sea correcta
+const { tiposProductoSchema } = require('../schemas/authSchemas'); //Programar el schema de tipo producto
 const { z } = require('zod'); // <-- Añade esta línea
 
-const Ticket = require("../models/ticket.model")(sequelize, DataTypes);
+const TipoProducto = require("../models/tipoProducto.model")(sequelize, DataTypes);
 
-
-const obtenerTickets = async (req, res) => {
+const obtenerTiposProductos = async (req, res) => {
   try {
-    const tickets = await Ticket.findAll();
-    res.json(tickets);
+    const tiposProductos = await TipoProducto.findAll();
+    res.json(tiposProductos);
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener tickets', detalle: error.message });
+    res.status(500).json({ error: 'Error al obtener los tipos de productos:', detalle: error.message });
   }
 };
 
-const obtenerTicketPorId = async (req, res) => {
+const obtenerTipoProductoPorId = async (req, res) => {
     try {
         const { id } = req.params;
-        const ticketId = await Ticket.findByPk(id);
-        res.json(ticketId);
+        const tipoProductoId = await TipoProducto.findByPk(id);
+        res.json(tipoProductoId);
     } catch (error) {
-        res.status(400).json({ error: "Error al obtener la ticket" })
+        res.status(400).json({ error: "Error al obtener el tipo del producto" })
     }
 };
 
-const crearTicket = async (req, res) => {
+const crearTipoProducto = async (req, res) => {
     const userData = req.body;
 
     try {
         // Validar los datos con Zod
-        const validatedData = ticketSchema.parse(userData);
+        const validatedData = tiposProductoSchema.parse(userData);
 
         // Crear la ubicación con los datos validados
-        const nuevoTicket = await Ticket.create(validatedData);
+        const nuevoTipoProducto = await TipoProducto.create(validatedData);
 
-        res.status(201).json(nuevoTicket);
+        res.status(201).json(nuevoTipoProducto);
     } catch (error) {
-        console.error("Error al crear Ticket:", error); // Muestra todo el error en consola
+        console.error("Error al crear Tipo:", error); // Muestra todo el error en consola
 
          // Manejo de errores de Zod (validación)
         if (error instanceof z.ZodError) {
@@ -78,33 +77,33 @@ const crearTicket = async (req, res) => {
 
         // Otros errores generales
         return res.status(500).json({
-            error: "No se pudo crear el Ticket",
+            error: "No se pudo crear el tipo de producto",
             detalle: error.message || "Error desconocido"
         });
     }
 };
 
-const actualizarTicket = async (req, res) => {
+const actualizarTipoProducto = async (req, res) => {
   const { id } = req.params;
   const datos = req.body;
-  const ticket = await Ticket.findByPk(id);
-  if (!ticket) return res.status(404).json({ error: "No encontrado" });
-  await ticket.update(datos);
-  res.json(ticket);
+  const tipoProducto = await TipoProducto.findByPk(id);
+  if (!tipoProducto) return res.status(404).json({ error: "No encontrado" });
+  await tipoProducto.update(datos);
+  res.json(usuario);
 };
 
-const eliminarTicket = async (req, res) => {
+const eliminarTipoProducto = async (req, res) => {
   const { id } = req.params;
-  const ticket = await Ticket.findByPk(id);
-  if (!ticket) return res.status(404).json({ error: "No encontrado" });
-  await ticket.destroy();
+  const tipoProducto = await TipoProducto.findByPk(id);
+  if (!tipoProducto) return res.status(404).json({ error: "No encontrado" });
+  await tipoProducto.destroy();
   res.json({ mensaje: "Eliminado" });
 };
 
 module.exports = {
-    obtenerTickets, 
-    obtenerTicketPorId,
-    crearTicket,
-    actualizarTicket,
-    eliminarTicket
+    obtenerTiposProductos, 
+    obtenerTipoProductoPorId,
+    crearTipoProducto,
+    actualizarTipoProducto,
+    eliminarTipoProducto
 };
