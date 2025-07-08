@@ -7,7 +7,7 @@ const Usuario = require("../models/usuario.model")(sequelize, DataTypes);
 // Costo del hashing - puede ajustarse según necesidades de seguridad/performance
 const SALT_ROUNDS = 10;
 const TOKEN_EXPIRATION = '1h';
-const ROL_PROVEEDOR_ID = 2;
+const ROL_ADMIN_ID = 1;
 
 /**
  * Genera un token JWT para un usuario
@@ -145,7 +145,7 @@ const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(contraseña, SALT_ROUNDS);
 
     const user = await Usuario.create({
-      rol_id: ROL_PROVEEDOR_ID, // Fijado desde backend
+      rol_id: ROL_ADMIN_ID, // Fijado desde backend
       email,
       contrasena_hash: hashedPassword,
       nombre,

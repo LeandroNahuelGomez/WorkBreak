@@ -54,23 +54,23 @@ const checkAuth = async (req, res, next) => {
     // Paso 6: Adjuntar el usuario a la solicitud para uso en rutas posteriores
     req.user = user;
 
-        // Paso 7: Pasar al siguiente middleware o controlador de ruta
+    // Paso 7: Pasar al siguiente middleware o controlador de ruta
     next();
   } catch (error) {
     // Manejo de errores
     let errorMessage = 'Token inválido o expirado';
     let statusCode = 401;
-    
+
     // Mensajes más específicos según el tipo de error
     if (error instanceof jwt.TokenExpiredError) {
       errorMessage = 'Token expirado';
     } else if (error instanceof jwt.JsonWebTokenError) {
       errorMessage = 'Token inválido';
     }
-    
-    res.status(statusCode).json({ 
+
+    res.status(statusCode).json({
       error: errorMessage,
-      details: error.message 
+      details: error.message
     });
   }
 };
@@ -79,7 +79,7 @@ const checkRole = (allowedRoles) => (req, res, next) => {
   // console.log("[checkRole] Roles permitidos:", allowedRoles, "Rol usuario:", req.user?.rol_id);
   try {
     if (!req.user) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
         error: 'Usuario no autenticado',
         code: 'NOT_AUTHENTICATED'
@@ -88,9 +88,9 @@ const checkRole = (allowedRoles) => (req, res, next) => {
 
     // Convierte a array si es un solo rol
     const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
-    
+
     if (!roles.includes(req.user.rol_id)) {
-      return res.status(403).json({ 
+      return res.status(403).json({
         success: false,
         error: 'Acceso prohibido - Rol insuficiente',
         code: 'INSUFFICIENT_ROLE',
@@ -98,7 +98,7 @@ const checkRole = (allowedRoles) => (req, res, next) => {
         userRole: req.user.rol_id
       });
     }
-    
+
     next();
   } catch (error) {
     console.error('Error en checkRole:', error);
