@@ -418,7 +418,7 @@ class EditFormManager {
 
         // Conversión de tipos para campos numéricos y booleanos
         if (apiData.capacidad !== undefined) apiData.capacidad = Number(apiData.capacidad);
-        if (apiData.precioxdia !== undefined) apiData.precioxdia = Number(apiData.precioxdia);
+        if (apiData.precio_hora !== undefined) apiData.precio_hora = Number(apiData.precio_hora);
         if (apiData.activo !== undefined) apiData.activo = apiData.activo === "true";
 
         // Validación adicional para producto
@@ -573,7 +573,7 @@ const formsConfig = [
             "agregar-descripcion": "descripcion",
             "agregar-capacidad": "capacidad",
             "agregar-normas": "normas",
-            "agregar-precio": "precioxdia"
+            "agregar-precio": "precio_hora"
         },
         isCreate: true, // Marcar como formulario de creación
         onSuccess: () => {
