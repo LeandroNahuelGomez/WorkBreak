@@ -24,11 +24,7 @@ const obtenerProductoPorId = async (req, res) => {
   }
 };
 
-<<<<<<< HEAD
 
-=======
-// Crear producto (con imagen)
->>>>>>> back-lean
 const crearProducto = async (req, res) => {
   try {
     const {
