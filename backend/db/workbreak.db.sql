@@ -93,10 +93,6 @@ CREATE TABLE tipo_producto (
 );
 
 
-
-
-
-
 -- Audit table
 CREATE TABLE auditoria (
   auditoria_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -108,10 +104,6 @@ CREATE TABLE auditoria (
   fecha_hora DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(usuario_id)
 );
-
-
-
-
 
 
 -- -- Indexes for better performance
