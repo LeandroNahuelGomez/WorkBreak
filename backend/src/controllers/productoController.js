@@ -24,7 +24,6 @@ const obtenerProductoPorId = async (req, res) => {
   }
 };
 
-// Crear producto (con imagen)
 const crearProducto = async (req, res) => {
   try {
     const {
