@@ -1,7 +1,13 @@
 
 document.addEventListener("DOMContentLoaded", async () => {
     // Nombre del cliente - suponemos que está en localStorage bajo "nombreCliente"
-    const nombreCliente = localStorage.getItem("nombreUsuario") || "Cliente Anónimo";
+    const nombreCliente = localStorage.getItem("nombreUsuario");
+
+    if (!nombreCliente) {
+        // No hay sesión, redirigir a login
+        window.location.replace("login-user.html");
+        return; // Detener ejecución
+    }
 
     // Fecha de hoy formateada (dd/mm/yyyy)
     const hoy = new Date();
@@ -56,12 +62,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
             const id_reserva = parseInt(reservaId);
-            
+
 
             // Armar objeto compatible con la API
             const datosParaEnviar = {
-                    reserva_id: id_reserva,
-                    nombre_usuario: reserva.nombreUsuario || "Usuario Anónimo",
+                reserva_id: id_reserva,
+                nombre_usuario: reserva.nombreUsuario || "Usuario Anónimo",
             };
 
             console.log('Datos a enviar:', datosParaEnviar);
@@ -77,25 +83,29 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error("Error al enviar reservas a la base de datos:", error.message);
     }
 
+    document.getElementById("btn-volver").addEventListener("click", () => {
+        localStorage.clear();
+        window.location.replace("login-user.html");
+    });
 
-    // Botón para volver a reservas
-    document.getElementById("btn-volver").addEventListener("click", async () => {
+
+    // Botón para descargar el ticket sin salir
+    document.getElementById("btn-descargar").addEventListener("click", async () => {
         const ticket = document.getElementById("ticket");
-        const boton = document.getElementById("btn-volver");
 
+        // Ocultamos ambos botones para que no salgan en el PDF
+        const btnVolver = document.getElementById("btn-volver");
+        const btnDescargar = document.getElementById("btn-descargar");
+        btnVolver.style.display = "none";
+        btnDescargar.style.display = "none";
 
-        // Ocultar el botón antes de capturar
-        boton.style.display = "none";
-
-        // Esperá un momento para que el DOM se actualice
+        // Esperar a que el DOM se actualice
         await new Promise(resolve => setTimeout(resolve, 100));
 
-        // Capturar con html2canvas
-        const canvas = await html2canvas(ticket, {
-            scale: 2
-        });
-
+        // Captura y exporta a PDF
+        const canvas = await html2canvas(ticket, { scale: 2 });
         const imgData = canvas.toDataURL("image/png");
+
         const pdf = new window.jspdf.jsPDF({
             orientation: 'portrait',
             unit: 'px',
@@ -105,8 +115,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
         pdf.save(`ticket_${Date.now()}.pdf`);
 
-        localStorage.clear();
-        window.location.href = "login-user.html";
+        // Restaurar visibilidad de los botones
+        btnVolver.style.display = "inline-block";
+        btnDescargar.style.display = "inline-block";
     });
-
 });
+
+

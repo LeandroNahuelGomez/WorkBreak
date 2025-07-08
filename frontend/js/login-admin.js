@@ -61,7 +61,7 @@ document.getElementById('adminForm').addEventListener('submit', async (e) => {
 const secretBtn = document.getElementById("adminSecretBtn");
 
 secretBtn.addEventListener("click", () => {
-        window.location.href = "login-user.html";
+    window.location.href = "login-user.html";
 });
 // Detectar doble clic en el logo
 const logo = document.querySelector("img"); // O usá un id si lo tenés: document.getElementById("logo")
@@ -76,15 +76,36 @@ logo.addEventListener("dblclick", () => {
     // Verificamos que todos existan
     if (nombre && apellido && email && password && loginBtn) {
         // Asignamos valores de prueba
-        nombre.value = "Lorenzo";
+        nombre.value = "Leandro";
         apellido.value = "Gomez";
-        email.value = "lolito@gmail.com";
-        password.value = "Lolito123_";
+        email.value = "leandro@gmail.com";
+        password.value = "Leandro123_";
 
         // Habilitamos el botón si estaba deshabilitado
         loginBtn.disabled = false;
     } else {
         console.warn("❌ Uno o más campos del formulario no se encontraron");
+    }
+});
+
+let clickCount = 0;
+let clickTimer;
+
+const titulo = document.getElementById("tituloWorkBreak");
+
+titulo.addEventListener("click", () => {
+    clickCount++;
+
+    clearTimeout(clickTimer); // reinicia el contador si clickean rápido
+
+    if (clickCount === 4) {
+        // Redirigir a la pantalla de registro
+        window.location.href = "register-admin.html";
+    } else {
+        // Si no llegaron a 4, resetea después de 1.5 segundos
+        clickTimer = setTimeout(() => {
+            clickCount = 0;
+        }, 1500);
     }
 });
 

@@ -2,22 +2,32 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Mis Reservas</title>
-    <link rel="stylesheet" href="../styles/reserva.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mis Reservas - WorkBreak</title>
+    <link rel="stylesheet" href="../styles/reserva.css" />
+    <link rel="icon" href="../img/Logo_Workbreak (1).ico" type="image/x-icon" />
 </head>
 
 <body>
+    <!-- Encabezado de la aplicación -->
+    <header class="app-header">
+        <img src="../img/Logo_Workbreak.png" alt="Logo WorkBreak" class="logo-img" />
+        <span class="logo-text">WorkBreak</span>
+        <span class="student-names">Leandro Gomez</span>
+    </header>
+
     <h1>Mis Reservas</h1>
     <div id="lista-reservas"></div>
 
     <!-- Botón Finalizar -->
-    <div class="finalizar-container" style="text-align:center; margin-top: 20px;">
+    <div class="finalizar-container">
+        <button id="btn-volver" class="boton-secundario">Volver</button>
         <button id="btn-finalizar">Finalizar</button>
     </div>
 
-<script src="../js/api.js"></script>
-<script src="../js/reserva.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/reserva.js"></script>
 </body>
 
 </html>

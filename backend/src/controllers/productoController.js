@@ -1,93 +1,145 @@
-const { DataTypes, Op } = require("sequelize")
-const { sequelize } = require("../config/db.config")
+const { DataTypes, Op } = require("sequelize");
+const { sequelize } = require("../config/db.config");
 
 const Producto = require("../models/producto.model")(sequelize, DataTypes);
 
-
+// Obtener todos los productos activos
 const obtenerProductos = async (req, res) => {
   try {
-    const productos = await Producto.findAll({ where: { activo: true } });
+    const productos = await Producto.findAll();
     res.json(productos);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtener productos', detalle: error.message });
   }
 };
 
+// Obtener producto por ID
 const obtenerProductoPorId = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const productoId = await Producto.findByPk(id);
-        res.json(productoId);
-    } catch (error) {
-        res.status(400).json({ error: "Error al obtener el producto" })
-    }
+  try {
+    const { id } = req.params;
+    const productoId = await Producto.findByPk(id);
+    res.json(productoId);
+  } catch (error) {
+    res.status(400).json({ error: "Error al obtener el producto" });
+  }
 };
 
+// Crear producto (con imagen)
 const crearProducto = async (req, res) => {
-    const userData = req.body;
+  try {
+    const {
+      tipo_producto_id,
+      titulo,
+      descripcion,
+      capacidad,
+      normas,
+      precio_hora
+    } = req.body;
 
-    try {
-        const nuevoProducto = await Producto.create(userData);
-        res.status(201).json(nuevoProducto);
-    } catch (error) {
-        console.error("Error al crear producto:", error); // Muestra todo el error en consola
+    const imagen = req.file ? req.file.filename : null;
 
-        if (error.name === 'SequelizeValidationError') {
-            // Errores de validación de campos obligatorios o tipos incorrectos
-            const mensajes = error.errors.map(e => e.message);
-            return res.status(400).json({
-                error: "Errores de validación",
-                detalles: mensajes
-            });
-        }
+    const nuevoProducto = await Producto.create({
+      tipo_producto_id,
+      titulo,
+      descripcion,
+      capacidad,
+      normas,
+      precio_hora,
+      imagen
+    });
 
-        if (error.name === 'SequelizeUniqueConstraintError') {
-            // Errores por violar restricciones únicas (como email único)
-            const mensajes = error.errors.map(e => e.message);
-            return res.status(400).json({
-                error: "Violación de restricción única",
-                detalles: mensajes
-            });
-        }
+    res.status(201).json(nuevoProducto);
+  } catch (error) {
+    console.error("Error al crear producto:", error);
 
-        if (error.name === 'SequelizeForeignKeyConstraintError') {
-            // Errores por usar un rol_id que no existe
-            return res.status(400).json({
-                error: "Violación de clave foránea",
-                detalles: "El rol especificado no existe"
-            });
-        }
-
-        // Otros errores generales
-        return res.status(500).json({
-            error: "No se pudo crear el producto",
-            detalle: error.message || "Error desconocido"
-        });
+    if (error.name === 'SequelizeValidationError') {
+      const mensajes = error.errors.map(e => e.message);
+      return res.status(400).json({
+        error: "Errores de validación",
+        detalles: mensajes
+      });
     }
+
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      const mensajes = error.errors.map(e => e.message);
+      return res.status(400).json({
+        error: "Violación de restricción única",
+        detalles: mensajes
+      });
+    }
+
+    if (error.name === 'SequelizeForeignKeyConstraintError') {
+      return res.status(400).json({
+        error: "Violación de clave foránea",
+        detalles: "El tipo de producto especificado no existe"
+      });
+    }
+
+    return res.status(500).json({
+      error: "No se pudo crear el producto",
+      detalle: error.message || "Error desconocido"
+    });
+  }
 };
 
+// Actualizar producto (opcional: reemplazar imagen)
 const actualizarProducto = async (req, res) => {
   const { id } = req.params;
-  const datos = req.body;
-  console.log("Datos recibidos para actualizar:", datos); // <-- LOG PARA DEPURAR
-  const producto = await Producto.findByPk(id);
-  if (!producto) return res.status(404).json({ error: "No encontrado" });
-  await producto.update(datos);
-  res.json(producto);
+
+  try {
+    const producto = await Producto.findByPk(id);
+    if (!producto) return res.status(404).json({ error: "No encontrado" });
+
+    const {
+      tipo_producto_id,
+      titulo,
+      descripcion,
+      capacidad,
+      normas,
+      precio_hora,
+      activo
+    } = req.body;
+
+    // Si hay imagen nueva, se actualiza
+    const nuevaImagen = req.file ? req.file.filename : producto.imagen;
+
+    await producto.update({
+      tipo_producto_id,
+      titulo,
+      descripcion,
+      capacidad,
+      normas,
+      precio_hora,
+      activo,
+      imagen: nuevaImagen
+    });
+
+    res.json(producto);
+  } catch (error) {
+    console.error("Error al actualizar producto:", error);
+    res.status(500).json({ error: "Error al actualizar el producto", detalle: error.message });
+  }
 };
 
+// Eliminar producto
 const eliminarProducto = async (req, res) => {
   const { id } = req.params;
-  const producto = await Producto.findByPk(id);
-  if (!producto) return res.status(404).json({ error: "No encontrado" });
-  await producto.destroy();
-  res.json({ mensaje: "Eliminado" });
+
+  try {
+    const producto = await Producto.findByPk(id);
+    if (!producto) return res.status(404).json({ error: "No encontrado" });
+
+    await producto.destroy();
+    res.json({ mensaje: "Eliminado" });
+  } catch (error) {
+    res.status(500).json({ error: "Error al eliminar producto", detalle: error.message });
+  }
 };
 
 module.exports = {
-    obtenerProductos,
-    obtenerProductoPorId,
-    crearProducto,
-    actualizarProducto,
-    eliminarProducto
+  obtenerProductos,
+  obtenerProductoPorId,
+  crearProducto,
+  actualizarProducto,
+  eliminarProducto,
 };

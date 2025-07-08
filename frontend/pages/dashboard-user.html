@@ -7,6 +7,7 @@
     <title>WorkBreak - Espacios para trabajar y relajarse</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../styles/dashboard-user.css">
+    <link rel="icon" href="../img/Logo_Workbreak (1).ico" type="image/x-icon" />
 </head>
 
 <body>
@@ -19,44 +20,37 @@
 
             <div class="nav-links">
                 <a href="#">Inicio</a>
-                <a href="#">Sobre Nosotros</a>
                 <a href="#" id="dark-mode-toggle">Modo oscuro</a>
                 <a href="../pages/reserva.html">Mis reservas <span id="badge-reservas" class="badge">0</span> </a>
             </div>
         </nav>
     </header>
-
-    <div class="search-bar">
-        <div class="search-container">
-            <div class="input-icon-wrapper">
-                <i class="fas fa-search"></i>
-                <input type="text" class="search-input"
-                    placeholder="Buscar espacios de trabajo, relax o creativos..." />
+    <main>
+        <div class="search-bar">
+            <div class="search-container">
+                <div class="input-icon-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="search-input"
+                        placeholder="Buscar espacios de trabajo, relax o creativos..." />
+                </div>
+                <button class="search-btn">Buscar</button>
+                <button class="filter-btn-open" id="abrir-filtros">Filtrar</button>
             </div>
-            <button class="search-btn">Buscar</button>
-            <button class="filter-btn-open" id="abrir-filtros">Filtrar</button>
         </div>
-    </div>
 
-    <div class="container">
-        <h1>Espacios en Buenos Aires</h1>
-        <div class="properties-grid" id="espacios-populares"></div>
-
-        <div class="new-country">
-            <h2>Espacios en nuevos destinos</h2>
-            <div class="properties-grid" id="espacios-nuevos"></div>
+        <div class="container">
+            <h1>Espacios en Buenos Aires</h1>
+            <div class="properties-grid" id="espacios-populares"></div>
         </div>
-    </div>
+    </main>
 
     <footer>
         <div class="footer-links">
-            <a href="#">Acerca de WorkBreak</a>
-            <a href="#">Cómo funciona</a>
-            <a href="#">Términos y privacidad</a>
-            <a href="#">Contacto</a>
+            <p>Leandro Gomez</p>
         </div>
-        <p>© 2023 WorkBreak. Todos los derechos reservados.</p>
+        <p>© 2025 WorkBreak. Todos los derechos reservados.</p>
     </footer>
+
     <div class="filter-modal" id="modal-filtros">
         <div class="filter-content">
             <div class="filter-header">

@@ -4,9 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login Empresa - WorkBreak</title>
-  <link rel="stylesheet" href="../styles/login-admin.css" />
-  <link rel="icon" href="../img/Logo_Workbreak (1).ico" type="image/x-icon" />
+  <title>Registro Administrador - WorkBreak</title>
+  <link rel="stylesheet" href="../styles/register-admin.css" />
 </head>
 
 <body>
@@ -18,9 +17,16 @@
 
   <!-- Formulario -->
   <div class="login-box">
-    <h1>Ingreso Administrador</h1>
-    <p>Ingresa tus credenciales</p>
-    <form class="form" id="adminForm">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+    <h1>Registrate</h1>
+    <p>Crea tu cuenta</p>
+    <form class="form" id="registerForm">
       <label for="name">Nombre</label>
       <input type="text" id="name" placeholder="Tu nombre" required />
 
@@ -33,20 +39,19 @@
       <label for="password">Contraseña</label>
       <input type="password" id="password" placeholder="••••••••" required />
 
-      <button type="submit" id="loginBtn" disabled>Iniciar sesión</button>
+      <label for="phone">Teléfono</label>
+      <input type="tel" id="phone" placeholder="+56 9 1234 5678" />
 
-      <div class="info">
-        ¿Olvidaste tu contraseña?
-      </div>
+      <button type="submit" id="registerBtn" disabled>Registrate</button>
+
     </form>
   </div>
 
-  <button id="adminSecretBtn" class="secret-btn">⇄</button>
 
+  </div>
+  <script src="../js/api.js"></script>
+  <script src="../js/register-admin.js"></script>
 
 </body>
-
-<script type="module" src="../js/api.js"></script>
-<script type="module" src="../js/login-admin.js"></script>
 
 </html>

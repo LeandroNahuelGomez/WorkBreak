@@ -45,7 +45,7 @@ body {
     margin-bottom: 15px;
 }
 
-#btn-volver {
+.boton-ticket {
     margin-top: 35px;
     background: linear-gradient(135deg, #f59e0b, #fbbf24);
     border: none;
@@ -60,13 +60,13 @@ body {
     user-select: none;
 }
 
-#btn-volver:hover {
+.boton-ticket:hover {
     background: linear-gradient(135deg, #fbbf24, #f59e0b);
     box-shadow: 0 12px 20px rgba(251, 191, 36, 0.6);
     transform: translateY(-3px);
 }
 
-#btn-volver:active {
+.boton-ticket:active {
     transform: translateY(1px);
     box-shadow: 0 6px 10px rgba(245, 158, 11, 0.3);
 }

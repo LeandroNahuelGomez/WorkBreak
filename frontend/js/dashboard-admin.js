@@ -1,20 +1,20 @@
 // Cargar productos desde la API
-async function cargarProductos() {
+async function cargarProductos(tipoFiltro = null) {
     const tabla = document.getElementById("tablaProductos");
     const tbody = tabla.querySelector("tbody");
 
     try {
-        // Limpiar tabla antes de cargar
-        tbody.innerHTML = "";
+        // Mostrar spinner de carga
+        tbody.innerHTML = "<tr><td colspan='10' class='text-center'><div class='spinner-border' role='status'><span class='visually-hidden'>Cargando...</span></div></td></tr>";
 
         // Obtener token del localStorage
         const token = localStorage.getItem("token");
-
         if (!token) {
             window.location.href = "login-admin.html";
             return;
         }
 
+        // Obtener TODOS los productos
         const res = await apiClient.fetchAPI("productos", {
             method: "GET",
             headers: {
@@ -24,12 +24,39 @@ async function cargarProductos() {
 
         console.log("Respuesta de API productos:", res);
 
-        const productos = Array.isArray(res) ? res : res.productos;
-
-        if (!productos || productos.length === 0) {
-            throw new Error("No se encontraron productos.");
+        // Manejar diferentes formatos de respuesta
+        let productos = [];
+        if (Array.isArray(res)) {
+            productos = res;
+        } else if (res && res.productos) {
+            productos = res.productos;
+        } else if (res && res.data) {
+            productos = res.data; // Para APIs que usan formato {data: [...]}
         }
 
+        // Aplicar filtro localmente si se especificó un tipo
+        if (tipoFiltro && !isNaN(tipoFiltro)) {
+            productos = productos.filter(p => p.tipo_producto_id == tipoFiltro);
+        }
+
+        // Limpiar tabla para mostrar resultados
+        tbody.innerHTML = "";
+
+        if (productos.length === 0) {
+            const mensaje = tipoFiltro 
+                ? `No se encontraron productos del tipo ${tipoFiltro}` 
+                : "No se encontraron productos.";
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="10" class="text-center py-4 text-muted">
+                        ${mensaje}
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        // Mostrar los productos en la tabla
         productos.forEach(p => {
             const fila = document.createElement("tr");
             const estadoTexto = p.activo ? "Activo" : "Inactivo";
@@ -57,12 +84,16 @@ async function cargarProductos() {
         });
 
         tabla.classList.remove("d-none");
-        const spinner = document.querySelector("#divListadoProductos .spinner-border");
-        if (spinner) spinner.remove();
+        document.querySelector("#divListadoProductos .spinner-border")?.remove();
+
     } catch (error) {
-        console.error("Error al cargar productos:", error.message);
-        document.querySelector("#divListadoProductos").innerHTML = `
-            <div class="alert alert-danger">Error al cargar productos: ${error.message}</div>
+        console.error("Error al cargar productos:", error);
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="10" class="text-center py-4 text-danger">
+                    Error al cargar productos: ${error.message}
+                </td>
+            </tr>
         `;
     }
 }
@@ -154,9 +185,8 @@ class EditFormManager {
             }
 
             // Manejo específico del botón "Agregar producto" por ID o texto
-            if (e.target.id === "btnAgregarProducto" ||
-                e.target.textContent.trim().includes("Agregar producto") ||
-                e.target.closest('[id="btnAgregarProducto"]')) {
+            if (e.target.matches("#btnAgregarProducto") ||
+                e.target.closest("#btnAgregarProducto")) {
                 console.log("Botón Agregar producto clickeado"); // Debug
                 await this.handleCreateClick("formAgregarProducto");
             }
@@ -167,6 +197,41 @@ class EditFormManager {
             } else if (e.target.classList.contains("btn-activar-producto")) {
                 await this.handleToggleProducto(e.target, true);
             }
+
+            // Manejo de botón eliminar usuario
+            if (e.target.classList.contains("btn-eliminar-usuario")) {
+                console.log("Elemento clickeado:", e.target); // ✅ Ver el botón real
+                const id = e.target.getAttribute("data-id");
+                const nombre = e.target.getAttribute("data-nombre");
+                console.log(`Enviando petición a: http://localhost:3000/api/v1/usuarios/${id} data-nombre=${nombre}`);
+
+                if (confirm(`¿Estás seguro que querés eliminar al usuario "${nombre}"?`)) {
+                    try {
+                        const token = localStorage.getItem("token");
+                        await apiClient.fetchAPI(`usuarios/${id}`, {
+                            method: "DELETE",
+                            headers: {
+                                "Authorization": `Bearer ${token}`
+                            }
+                        });
+
+                        console.log("Usuario eliminado correctamente");
+                        cargarEmpleados(); // Recargar tabla
+                    } catch (error) {
+                        console.error("Error al eliminar usuario:", error);
+                        alert(`Error al eliminar usuario: ${error.message}`);
+                    }
+                }
+            }
+
+
+            // Manejo específico del botón "Agregar empleado" por ID o texto
+            if (e.target.matches("#btnAgregarEmpleado") ||
+                e.target.closest("#btnAgregarEmpleado")) {
+                console.log("Botón Agregar empleado clickeado"); // Debug
+                await this.handleCreateClick("formAgregarEmpleado");
+            }
+
         });
     }
 
@@ -191,7 +256,7 @@ class EditFormManager {
 
         // Si es el formulario de productos, cargar tipos
         if (formId === "formAgregarProducto") {
-            await cargarTiposProducto(); // 👈 cargar opciones del select
+            await cargarProductos(); // 👈 cargar opciones del select
         }
         console.log(`[handleCreateClick] Card ${config.cardId} mostrada`);
     }
@@ -450,7 +515,7 @@ const formsConfig = [
         editButtonClass: "btn-editar-usuario",
         apiEndpoint: "usuarios",
         fieldsMapping: {
-            "editar-id": "usuario_id",
+            "editar-id-usuario": "usuario_id",
             "editar-nombre": "nombre",
             "editar-apellido": "apellido",
             "editar-email": "email",
@@ -475,7 +540,7 @@ const formsConfig = [
         editButtonClass: "btn-editar-producto",
         apiEndpoint: "productos",
         fieldsMapping: {
-            "editar-id": "producto_id",
+            "editar-id-producto": "producto_id",
             "editar-tipo-producto": "tipo_producto_id",
             "editar-titulo": "titulo",
             "editar-descripcion": "descripcion",
@@ -520,6 +585,32 @@ const formsConfig = [
         reloadFunction: () => {
             cargarProductos();
         }
+    },
+        {
+        formId: "formAgregarEmpleado",
+        cardId: "cardAgregarEmpleado",
+        cancelButtonId: "btnCancelarAgregarEmpleado",
+        editButtonClass: "btnAgregarEmpleado",
+        apiEndpoint: "auth/register",
+        fieldsMapping: {
+            "agregar-rol": "rol_id",
+            "agregar-nombre": "nombre",
+            "agregar-apellido": "apellido",
+            "agregar-email": "email",
+            "agregar-contrasena": "contraseña",
+            "agregar-telefono": "telefono"
+        },
+        isCreate: true, // Marcar como formulario de creación
+        onSuccess: () => {
+            console.log("Producto agregado exitosamente");
+        },
+        onError: (error) => {
+            console.error("Error al agregar producto:", error);
+            alert(`Error: ${error}`);
+        },
+        reloadFunction: () => {
+            cargarEmpleados();
+        }
     }
 ];
 
@@ -553,6 +644,8 @@ async function cargarEmpleados() {
             throw new Error("No se encontraron empleados.");
         }
 
+        tbody.innerHTML = ""; // ✅ Soluciona duplicados
+
         empleados.forEach(emp => {
             const fila = document.createElement("tr");
             fila.innerHTML = `
@@ -563,7 +656,7 @@ async function cargarEmpleados() {
                 <td>${emp.rol_id || "Sin rol"}</td>
                 <td>
                     <button class="btn btn-sm btn-primary btn-editar-usuario" data-id="${emp.usuario_id}">Editar</button>
-                    <button class="btn btn-sm btn-danger">Eliminar</button>
+                    <button class="btn btn-sm btn-danger btn-eliminar-usuario" data-id="${emp.usuario_id}" data-nombre="${emp.nombre}">Eliminar</button>
                 </td>
             `;
             tbody.appendChild(fila);
@@ -609,7 +702,7 @@ async function actualizarMetricasDashboard() {
         console.log("Respuesta de API usuarios:", res2);
         const usuarios = Array.isArray(res2) ? res2 : res2.usuarios;
 
-        const res3 = await apiClient.fetchAPI("reservas", {
+        const res3 = await apiClient.fetchAPI("reserva", {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`
@@ -648,6 +741,8 @@ async function actualizarMetricasDashboard() {
 window.addEventListener('load', function () {
     cargarEmpleados();
     cargarProductos();
+    cargarReservas();
+    cargarTickets();
     actualizarMetricasDashboard();
 
     // Configuración adicional para el botón agregar producto
@@ -658,9 +753,6 @@ window.addEventListener('load', function () {
 function setupAgregarProductoButton() {
     // Buscar el botón por diferentes métodos
     const btnAgregar = document.getElementById("btnAgregarProducto")
-    //   document.querySelector(".btnAgregarProducto") ||
-    //   document.querySelector('[data-action="agregar-producto"]') ||
-    //   document.querySelector('button:contains("Agregar producto")');
 
     if (btnAgregar) {
         console.log("Botón 'Agregar producto' encontrado:", btnAgregar);
@@ -688,3 +780,151 @@ function handleAgregarProductoClick(e) {
     editFormManager.handleCreateClick("formAgregarProducto");
 }
 
+
+// Cargar empleados (función original)
+// Función mejorada para cargar reservas
+async function cargarReservas() {
+    const tabla = document.getElementById("tablaReservas");
+    const tbody = tabla.querySelector("tbody");
+    try {
+        const token = localStorage.getItem("token");
+        
+        if (!token) {
+            window.location.href = "login-admin.html";
+            return;
+        }
+
+        const res = await apiClient.fetchAPI("reserva", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        console.log("Respuesta de API reservas:", res);
+
+        const reservas = Array.isArray(res) ? res : res.usuarios || [];
+
+        tbody.innerHTML = ""; // Limpiar tabla
+
+        if (reservas.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="text-center py-4 text-muted">
+                        No se encontraron reservas
+                    </td>
+                </tr>
+            `;
+        } else {
+            reservas.forEach(reser => {
+                const fila = document.createElement("tr");
+                fila.innerHTML = `
+                    <td>${reser.reserva_id}</td>
+                    <td>${reser.producto_id}</td>
+                    <td>${reser.nombre_usuario || 'Reserva sin nombre'}</td>
+                    <td>${reser.dia_reserva || 'null'}</td>
+                    <td>${reser.hora_llegada || '00:00:00'}</td>
+                    <td>${reser.hora_salida || '00:00:00'}</td>
+                    <td>${reser.cantidad_personas}</td>
+                    <td>$${parseFloat(reser.monto_total).toFixed(2)}</td>
+                    <td>${new Date(reser.registro_fecha_reserva).toLocaleString()}</td>
+                `;
+                tbody.appendChild(fila);
+            });
+        }
+
+        tabla.classList.remove("d-none");
+        const spinner = document.querySelector("#divListadoReservas .spinner-border");
+        if (spinner) spinner.remove();
+        
+    } catch (error) {
+        console.error("Error al cargar reservas:", error.message);
+        document.querySelector("#divListadoReservas").innerHTML = `
+            <div class="alert alert-danger">Error al cargar reservas: ${error.message}</div>
+        `;
+    }
+}
+
+
+async function cargarTickets() {
+    const tabla = document.getElementById("tablaTickets");
+    const tbody = tabla.querySelector("tbody");
+    try {
+        const token = localStorage.getItem("token");
+        
+        if (!token) {
+            window.location.href = "login-admin.html";
+            return;
+        }
+
+        const res = await apiClient.fetchAPI("ticket", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        console.log("Respuesta de API tickets:", res);
+
+        const tickets = Array.isArray(res) ? res : res.tickets || [];
+
+        tbody.innerHTML = ""; // Limpiar tabla
+
+        if (tickets.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="text-center py-4 text-muted">
+                        No se encontraron ticket
+                    </td>
+                </tr>
+            `;
+        } else {
+            tickets.forEach(tckt => {
+                const fila = document.createElement("tr");
+                fila.innerHTML = `
+                    <td>${tckt.ticket_id}</td>
+                    <td>${tckt.reserva_id}</td>
+                    <td>${tckt.nombre_usuario}</td>
+                    <td>${tckt.fecha_emision}</td>
+                    <td>${tckt.estado || "generado"}</td>
+                `;
+                tbody.appendChild(fila);
+            });
+        }
+
+        tabla.classList.remove("d-none");
+        const spinner = document.querySelector("#divListadoTickets .spinner-border");
+        if (spinner) spinner.remove();
+        
+    } catch (error) {
+        console.error("Error al cargar reservas:", error.message);
+        document.querySelector("#divListadoReservas").innerHTML = `
+            <div class="alert alert-danger">Error al cargar reservas: ${error.message}</div>
+        `;
+    }
+}
+
+document.getElementById('logout-btn').addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    // Limpiar localStorage
+    localStorage.clear();
+    
+    // Redirigir a login
+    window.location.href = 'login-admin.html';
+});
+
+// Configurar listeners para filtrado
+document.getElementById('btnFiltrarTipo')?.addEventListener('click', async () => {
+    const tipo = document.getElementById('inputFiltrarTipo').value;
+    if (tipo && !isNaN(tipo)) {
+        await cargarProductos(parseInt(tipo)); // Filtrado local
+    } else {
+        alert("Por favor ingrese un número válido para el tipo de producto");
+    }
+});
+
+document.getElementById('btnResetFiltro')?.addEventListener('click', async () => {
+    document.getElementById('inputFiltrarTipo').value = '';
+    await cargarProductos(); // Mostrar todos sin filtrar
+});

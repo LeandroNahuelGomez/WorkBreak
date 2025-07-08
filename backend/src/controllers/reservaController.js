@@ -25,6 +25,98 @@ const obtenerReservaPorId = async (req, res) => {
     }
 };
 
+const verificarDisponibilidad = async (req, res) => {
+  try {
+    const { producto_id, fecha, hora_entrada, hora_salida } = req.query;
+
+    console.log('Parámetros recibidos:', { producto_id, fecha, hora_entrada, hora_salida });
+
+    if (!producto_id || !fecha || !hora_entrada || !hora_salida) {
+      return res.status(400).json({ 
+        error: "Parámetros requeridos: producto_id, fecha, hora_entrada, hora_salida" 
+      });
+    }
+
+    // Buscar reservas existentes usando los nombres correctos de columnas
+    const reservasExistentes = await Reserva.findAll({
+      where: {
+        producto_id: parseInt(producto_id),
+        dia_reserva: fecha
+      }
+    });
+
+    console.log('Reservas encontradas:', reservasExistentes.length);
+
+    // Si no hay reservas existentes, está disponible
+    if (reservasExistentes.length === 0) {
+      return res.json({
+        disponible: true,
+        mensaje: "Horario disponible"
+      });
+    }
+
+    // Convertir las horas a minutos para una comparación más precisa
+    const convertirHoraAMinutos = (hora) => {
+      const [h, m] = hora.split(':').map(Number);
+      return h * 60 + m;
+    };
+
+    const nuevaEntradaMinutos = convertirHoraAMinutos(hora_entrada);
+    const nuevaSalidaMinutos = convertirHoraAMinutos(hora_salida);
+
+    console.log(`Nueva reserva: ${hora_entrada} (${nuevaEntradaMinutos} min) - ${hora_salida} (${nuevaSalidaMinutos} min)`);
+
+    // Verificar conflictos de horarios
+    for (const reserva of reservasExistentes) {
+      console.log('Verificando conflicto con reserva:', reserva.reserva_id);
+      
+      // Convertir horas de la reserva existente a minutos
+      const reservaEntradaMinutos = convertirHoraAMinutos(reserva.hora_llegada);
+      const reservaSalidaMinutos = convertirHoraAMinutos(reserva.hora_salida);
+
+      console.log(`Reserva existente: ${reserva.hora_llegada} (${reservaEntradaMinutos} min) - ${reserva.hora_salida} (${reservaSalidaMinutos} min)`);
+      
+      // ✅ LÓGICA CORREGIDA: Verificar si hay solapamiento
+      const hayConflicto = !(
+        nuevaSalidaMinutos <= reservaEntradaMinutos ||  // La nueva termina antes de que empiece la existente
+        nuevaEntradaMinutos >= reservaSalidaMinutos     // La nueva empieza después de que termine la existente
+      );
+
+      console.log('¿Hay conflicto?', hayConflicto);
+
+      if (hayConflicto) {
+        console.log('🚫 Conflicto encontrado con reserva:', reserva.reserva_id);
+        return res.json({
+          disponible: false,
+          mensaje: `Horario no disponible. Conflicto con reserva existente (${reserva.hora_llegada} - ${reserva.hora_salida})`,
+          reserva_conflicto: {
+            id: reserva.reserva_id,
+            hora_entrada: reserva.hora_llegada,
+            hora_salida: reserva.hora_salida
+          }
+        });
+      }
+    }
+
+    // Si no hay conflictos, está disponible
+    console.log('✅ Horario disponible');
+    res.json({
+      disponible: true,
+      mensaje: "Horario disponible"
+    });
+
+  } catch (error) {
+    console.error("Error completo al verificar disponibilidad:", error);
+    console.error("Stack trace:", error.stack);
+    
+    res.status(500).json({ 
+      error: "Error interno del servidor al verificar disponibilidad", 
+      detalle: error.message,
+      tipo: error.name
+    });
+  }
+};
+
 const crearReserva = async (req, res) => {
     const userData = req.body;
 
@@ -106,5 +198,6 @@ module.exports = {
     obtenerReservaPorId,
     crearReserva,
     actualizarReserva,
-    eliminarReserva
+    eliminarReserva,
+    verificarDisponibilidad
 };
