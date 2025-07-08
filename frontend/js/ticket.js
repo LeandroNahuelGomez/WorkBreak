@@ -121,4 +121,35 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 });
 
+document.addEventListener('DOMContentLoaded', function () {
+    // Obtener el valor del localStorage o establecer por defecto
+    const darkMode = localStorage.getItem('darkMode') === 'true';
 
+    // Aplicar el tema inicial
+    setTheme(darkMode);
+
+    // Configurar el botón de alternancia (si existe)
+    setupThemeToggle();
+});
+
+function setTheme(isDark) {
+    // Aplicar/remover la clase dark-mode al body
+    document.body.classList.toggle('dark-mode', isDark);
+
+    // Actualizar el localStorage
+    localStorage.setItem('darkMode', isDark);
+}
+
+function setupThemeToggle() {
+    const themeToggle = document.querySelector('.theme-toggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', function () {
+            const isDark = !document.body.classList.contains('dark-mode');
+            setTheme(isDark);
+        });
+    }
+}
+
+document.getElementById("btn-volver").addEventListener("click", () => {
+    window.location.href = "../pages/dashboard-user.html"; // Cambialo por el destino deseado
+});

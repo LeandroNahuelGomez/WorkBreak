@@ -71,7 +71,7 @@ async function cargarProductos(tipoFiltro = null) {
                 <td>${p.normas}</td>
                 <td><span class="${estadoClase}">${estadoTexto}</span></td>
                 <td>${p.fecha_creacion}</td>
-                <td>$${p.precioxdia}</td>
+                <td>$${p.precio_hora}</td>
                 <td>
                     <button class="btn btn-sm btn-primary btn-editar-producto" data-id="${p.producto_id}">Editar</button>
                     ${p.activo ?
@@ -328,6 +328,12 @@ class EditFormManager {
         `;
 
         document.body.appendChild(modal);
+        
+        
+        // Mostrar modal
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+
 
         // Configurar evento del botón confirmar
         const btnConfirmar = modal.querySelector(`#btnConfirmar${accion.charAt(0).toUpperCase() + accion.slice(1)}`);
@@ -343,8 +349,6 @@ class EditFormManager {
                     body: JSON.stringify({ activo: activar })
                 });
 
-                // Cerrar modal
-                const bsModal = new bootstrap.Modal(modal);
                 bsModal.hide();
 
                 // Recargar productos
@@ -357,9 +361,6 @@ class EditFormManager {
             }
         });
 
-        // Mostrar modal
-        const bsModal = new bootstrap.Modal(modal);
-        bsModal.show();
 
         // Limpiar modal después de cerrarlo
         modal.addEventListener('hidden.bs.modal', () => {
@@ -712,6 +713,16 @@ async function actualizarMetricasDashboard() {
         console.log("Respuesta de API productos:", res3);
         const reservas = Array.isArray(res3) ? res3 : res3.reservas;
 
+        const res4 = await apiClient.fetchAPI("ticket", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        console.log("Respuesta de API productos:", res4);
+        const tickets = Array.isArray(res4) ? res4 : res4.tickets;
+
         if (usuarios && usuarios.length > 0) {
             document.getElementById("initials-name").textContent = `${usuarios[0].nombre.charAt(0)}${usuarios[0].apellido.charAt(0)}`.toUpperCase();
             document.getElementById("name-admin").textContent = `${usuarios[0].nombre} ${usuarios[0].apellido}`;
@@ -725,6 +736,11 @@ async function actualizarMetricasDashboard() {
         if (reservas && reservas.length > 0) {
             document.getElementById("count-reservas").textContent = reservas.length;
         }
+
+        if (tickets && tickets.length > 0) {
+            document.getElementById("count-tickets").textContent = tickets.length;
+        }
+
 
     } catch (error) {
         console.error("Error al cargar métricas del dashboard:", error.message);
@@ -928,3 +944,4 @@ document.getElementById('btnResetFiltro')?.addEventListener('click', async () =>
     document.getElementById('inputFiltrarTipo').value = '';
     await cargarProductos(); // Mostrar todos sin filtrar
 });
+

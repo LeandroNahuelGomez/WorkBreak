@@ -1,5 +1,20 @@
+:root {
+    /* Colores adicionales para el ticket */
+    --ticket-bg-light: #fef9f0;
+    --ticket-container-bg: #ffffff;
+    --ticket-empresa-color: #b36b00;
+    --ticket-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+    
+    /* Colores para modo oscuro (consistentes con tu CSS base) */
+    --dark-ticket-bg: #121212;
+    --dark-ticket-container: #1e1e1e;
+    --dark-ticket-text: #e0e0e0;
+    --dark-ticket-text-light: #a0a0a0;
+}
+
+/* MODO CLARO (se mantiene EXACTAMENTE igual) */
 body {
-    background-color: #fef9f0;
+    background-color: var(--ticket-bg-light);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 30px 20px;
@@ -8,13 +23,13 @@ body {
 }
 
 .ticket-container {
-  max-width: 600px;
-  margin: 40px auto;
-  padding: 30px;
-  background-color: #fff;
-  border-radius: 16px;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
-  overflow: visible; /* ← Muy importante */
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: var(--ticket-container-bg);
+    border-radius: 16px;
+    box-shadow: var(--ticket-shadow);
+    overflow: visible;
 }
 
 .ticket-container h1 {
@@ -26,7 +41,7 @@ body {
     font-weight: 700;
     font-size: 1.3rem;
     margin-bottom: 25px;
-    color: #b36b00;
+    color: var(--ticket-empresa-color);
 }
 
 .cliente-info p,
@@ -71,3 +86,47 @@ body {
     box-shadow: 0 6px 10px rgba(245, 158, 11, 0.3);
 }
 
+/* MODO OSCURO (nuevas reglas) */
+body.dark-mode {
+    background-color: var(--dark-ticket-bg);
+    color: var(--dark-ticket-text);
+}
+
+body.dark-mode .ticket-container {
+    background-color: var(--dark-ticket-container);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+    border: 1px solid #333;
+}
+
+body.dark-mode .ticket-container h1,
+body.dark-mode .producto-info h2 {
+    color: var(--primary-color); /* Usa el mismo amarillo/naranja del modo claro */
+}
+
+body.dark-mode .empresa {
+    color: var(--primary-light); /* Tonelada más clara del color primario */
+}
+
+body.dark-mode .cliente-info p,
+body.dark-mode .producto-info p {
+    color: var(--dark-ticket-text-light);
+}
+
+body.dark-mode .boton-ticket {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    box-shadow: 0 8px 15px rgba(106, 17, 203, 0.4);
+}
+
+body.dark-mode .boton-ticket:hover {
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+    box-shadow: 0 12px 20px rgba(37, 117, 252, 0.6);
+}
+
+body.dark-mode .boton-ticket:active {
+    box-shadow: 0 6px 10px rgba(106, 17, 203, 0.3);
+}
+
+/* Transiciones suaves para el cambio de tema */
+body, .ticket-container, .boton-ticket {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}

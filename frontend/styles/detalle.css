@@ -1,5 +1,5 @@
-/* Estilos generales */
 :root {
+    /* Colores principales */
     --airbnb-pink: #FF385C;
     --airbnb-dark: #222222;
     --airbnb-light-gray: #f7f7f7;
@@ -7,32 +7,52 @@
     --airbnb-text: #484848;
     --primary-color: #f59e0b;
     --primary-light: #fbbf24;
-      --white: #ffffff;
+    --white: #ffffff;
+    
+    /* Modo oscuro */
+    --dark-bg: #121212;
+    --dark-card: #1e1e1e;
+    --dark-text: #e0e0e0;
+    --dark-text-light: #a0a0a0;
+    --dark-border: #333333;
+    --hover-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-    font-family: 'Roboto', sans-serif;
+    background-color: var(--airbnb-light-gray);
     color: var(--airbnb-text);
     line-height: 1.6;
+    transition: background-color 0.3s, color 0.3s;
 }
 
-/* Navbar estilizado */
+body.dark-mode {
+    background-color: var(--dark-bg);
+    color: var(--dark-text);
+}
+
+/* NAVBAR */
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 15px 40px;
-    border-bottom: 1px solid var(--airbnb-gray);
     position: sticky;
     top: 0;
     background: linear-gradient(to right, var(--primary-light), var(--primary-color));
     z-index: 100;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-bottom: none;
+}
+
+body.dark-mode .navbar {
+    background: linear-gradient(to right, #4d0a9a, #1a5bd8);
 }
 
 .logo-container {
@@ -44,6 +64,7 @@ body {
 .logo-img {
     height: 50px;
     width: auto;
+    filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.5));
     transition: transform 0.3s;
 }
 
@@ -75,11 +96,19 @@ body {
     border-radius: 30px;
     font-size: 14px;
     transition: all 0.3s;
+    background-color: white;
+}
+
+body.dark-mode .search-bar input {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-color: var(--dark-border);
+    color: var(--dark-text);
 }
 
 .search-bar input:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(255, 56, 92, 0.2);
+    border: 2px solid var(--primary-light);
+    box-shadow: 0 0 0 2px rgba(37, 117, 252, 0.2);
 }
 
 .search-bar i {
@@ -87,14 +116,18 @@ body {
     left: 15px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--airbnb-pink);
+    color: var(--primary-color);
+}
+
+body.dark-mode .search-bar i {
+    color: #8a2be2;
 }
 
 .user-menu {
     display: flex;
     gap: 15px;
     font-size: 18px;
-    color: var(--airbnb-dark);
+    color: var(--white);
 }
 
 .user-menu i {
@@ -104,20 +137,27 @@ body {
 
 .user-menu i:hover {
     transform: scale(1.1);
+    color: var(--white);
 }
 
-/* Galería de imágenes */
+/* GALERÍA DE IMÁGENES */
 .image-gallery {
-    display: flex;
-    gap: 10px;
+    width: calc(100% - 80px);
     margin: 20px 40px;
     height: 500px;
     border-radius: 12px;
     overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s;
+}
+
+body.dark-mode .image-gallery {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .main-image {
-    width: 70%;
+    width: 100%;
+    height: 100%;
     background-size: cover;
     background-position: center;
     transition: transform 0.3s;
@@ -128,30 +168,7 @@ body {
     transform: scale(1.02);
 }
 
-.thumbnails {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 30%;
-}
-
-.thumbnail {
-    flex: 1;
-    background-size: cover;
-    background-position: center;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s;
-    position: relative;
-    overflow: hidden;
-}
-
-.thumbnail:hover {
-    transform: scale(1.03);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* Contenido principal */
+/* CONTENIDO PRINCIPAL */
 .content-wrapper {
     display: flex;
     margin: 0 40px 40px;
@@ -167,13 +184,26 @@ body {
     position: sticky;
     top: 100px;
     height: fit-content;
+    background-color: var(--white);
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: var(--hover-shadow);
 }
 
-/* Detalles del alojamiento */
+body.dark-mode .booking-form {
+    background-color: var(--dark-card);
+    border: 1px solid var(--dark-border);
+}
+
+/* DETALLES DEL ALOJAMIENTO */
 .listing-details h1 {
     font-size: 28px;
     margin-bottom: 15px;
     color: var(--airbnb-dark);
+}
+
+body.dark-mode .listing-details h1 {
+    color: var(--dark-text);
 }
 
 .info-section {
@@ -188,7 +218,7 @@ body {
 }
 
 .rating i {
-    color: var(--airbnb-pink);
+    color: var(--primary-color);
 }
 
 .info-section p {
@@ -198,8 +228,12 @@ body {
     color: var(--airbnb-dark);
 }
 
+body.dark-mode .info-section p {
+    color: var(--dark-text);
+}
+
 .info-section i {
-    color: var(--airbnb-pink);
+    color: var(--primary-color);
 }
 
 .divider {
@@ -208,15 +242,24 @@ body {
     margin: 25px 0;
 }
 
+body.dark-mode .divider {
+    background: var(--dark-border);
+}
+
 .description p {
     font-size: 16px;
     line-height: 1.8;
 }
 
-/* Amenities */
+/* AMENITIES */
 .amenities h2 {
     font-size: 22px;
     margin-bottom: 20px;
+    color: var(--airbnb-dark);
+}
+
+body.dark-mode .amenities h2 {
+    color: var(--dark-text);
 }
 
 .amenities-grid {
@@ -232,16 +275,21 @@ body {
 }
 
 .amenity i {
-    color: var(--airbnb-pink);
+    color: var(--primary-color);
     font-size: 18px;
 }
 
-/* Reseñas */
+/* RESEÑAS */
 .reviews h2 {
     display: flex;
     align-items: center;
     gap: 5px;
     margin-bottom: 20px;
+    color: var(--airbnb-dark);
+}
+
+body.dark-mode .reviews h2 {
+    color: var(--dark-text);
 }
 
 .review-card {
@@ -249,6 +297,16 @@ body {
     padding: 20px;
     border-radius: 8px;
     margin-bottom: 15px;
+    transition: transform 0.3s;
+}
+
+body.dark-mode .review-card {
+    background: var(--dark-card);
+}
+
+.review-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--hover-shadow);
 }
 
 .review-header {
@@ -270,26 +328,18 @@ body {
     color: #666;
 }
 
-.review-text {
-    font-style: italic;
+body.dark-mode .review-header p {
+    color: var(--dark-text-light);
 }
 
-/* Formulario de reserva */
-.booking-form {
-    padding: 25px;
-    border: 1px solid var(--airbnb-gray);
-    border-radius: 12px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-}
-
+/* FORMULARIO DE RESERVA */
 .price-section h3 {
     font-size: 24px;
     color: var(--airbnb-dark);
 }
 
-.price-section h3 span {
-    font-size: 16px;
-    font-weight: normal;
+body.dark-mode .price-section h3 {
+    color: var(--dark-text);
 }
 
 .rating-small {
@@ -301,11 +351,11 @@ body {
 }
 
 .rating-small i {
-    color: var(--airbnb-pink);
+    color: var(--primary-color);
 }
 
 .rating-small a {
-    color: var(--airbnb-pink);
+    color: var(--primary-color);
     text-decoration: underline;
 }
 
@@ -329,6 +379,11 @@ body {
     color: var(--airbnb-dark);
 }
 
+body.dark-mode .date-input label,
+body.dark-mode .guests-input label {
+    color: var(--dark-text);
+}
+
 .date-input input,
 .guests-input #cantidad-personas {
     width: 100%;
@@ -337,20 +392,28 @@ body {
     border-radius: 8px;
     font-size: 14px;
     transition: all 0.3s;
+    background-color: var(--white);
+}
+
+body.dark-mode .date-input input,
+body.dark-mode .guests-input #cantidad-personas {
+    background-color: var(--dark-card);
+    border-color: var(--dark-border);
+    color: var(--dark-text);
 }
 
 .date-input input:focus,
 .guests-input select:focus {
     outline: none;
-    border-color: var(--airbnb-pink);
-    box-shadow: 0 0 0 2px rgba(255, 56, 92, 0.2);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
 }
 
 .reserve-btn {
     width: 100%;
     padding: 15px;
     margin: 15px 0;
-    background: linear-gradient(135deg, #FF385C 0%, #E61E4D 100%);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
     color: white;
     border: none;
     border-radius: 8px;
@@ -366,11 +429,7 @@ body {
 
 .reserve-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 56, 92, 0.3);
-}
-
-.reserve-btn:active {
-    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
 }
 
 .no-charge {
@@ -380,9 +439,17 @@ body {
     margin-bottom: 15px;
 }
 
+body.dark-mode .no-charge {
+    color: var(--dark-text-light);
+}
+
 .price-breakdown {
     border-top: 1px solid var(--airbnb-gray);
     padding-top: 15px;
+}
+
+body.dark-mode .price-breakdown {
+    border-top-color: var(--dark-border);
 }
 
 .price-row {
@@ -398,4 +465,120 @@ body {
     border-top: 1px solid var(--airbnb-gray);
     font-weight: bold;
     font-size: 16px;
+}
+
+body.dark-mode .price-row.total {
+    border-top-color: var(--dark-border);
+}
+
+/* BOTÓN VOLVER ATRÁS */
+#volverAtras-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#volverAtras-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* BOTÓN MODO OSCURO */
+#dark-mode-toggle {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--white);
+    transition: transform 0.3s;
+}
+
+#dark-mode-toggle:hover {
+    transform: scale(1.1);
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+    .content-wrapper {
+        flex-direction: column;
+    }
+    
+    .booking-form {
+        position: static;
+        margin-top: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 15px 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .search-bar {
+        width: 100%;
+        order: 3;
+    }
+    
+    .image-gallery {
+        width: calc(100% - 40px);
+        margin: 20px 20px;
+        height: 400px;
+    }
+    
+    .content-wrapper {
+        margin: 0 20px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .amenities-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .logo-text {
+        font-size: 1.5rem;
+    }
+    
+    .image-gallery {
+        height: 300px;
+    }
+}
+
+/* CAMBIAR COLOR EN MODO OSCURO DE LOS ICONOS Y TEXTOS AMARILLOS */
+body.dark-mode .amenity i,
+body.dark-mode .info-section i,
+body.dark-mode .rating i,
+body.dark-mode .rating-small i,
+body.dark-mode .rating-small a {
+    color: #82b1ff; /* Azul claro, podés ajustar el tono */
+}
+
+body.dark-mode .logo-text,
+body.dark-mode .price-section h3 span {
+    color: white;
+}
+
+body.dark-mode .reserve-btn {
+    background: linear-gradient(135deg, #4d0aff, #1a5bd8); /* Azul como en el ejemplo */
+}
+
+body.dark-mode .reserve-btn:hover {
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+}
+
+body.dark-mode #volverAtras-btn {
+    background: linear-gradient(135deg, #4d0aff, #1a5bd8); /* Azul degradado */
+    color: white;
+}
+
+body.dark-mode #volverAtras-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3); /* Sombra azul */
 }

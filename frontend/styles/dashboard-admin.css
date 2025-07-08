@@ -1,158 +1,81 @@
-/* ==== General Dashboard Styles ==== */
+:root {
+    /* Colores base */
+    --primary-color: #00b894;
+    --primary-light: #0984e3;
+    --secondary-color: #0984e3;
+
+    /* Estado y feedback */
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+
+    /* Texto y fondo */
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
+    --white: #ffffff;
+    --bg-light: #f9fafb;
+
+    /* Bordes y sombras */
+    --gray-border: #d1d5db;
+    --card-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    --hover-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* ==================== GLOBAL ==================== */
 body {
-    background-color: white;
+    background-color: var(--bg-light);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-dark);
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* ==================== CARDS ==================== */
 .card {
+    background-color: var(--white);
     border-radius: 16px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* ==== Título de usuario ==== */
 .card-title {
     font-size: 1.8rem;
     font-weight: bold;
+    color: var(--text-dark);
 }
 
 .card-subtitle {
     font-size: 1.1rem;
-    color: #6c757d;
+    color: var(--text-light);
 }
 
-/* ==== Redes Sociales ==== */
-.card-header {
-    font-size: 1rem;
-    font-weight: 600;
-}
-
-/* ==== Card de KPIs ==== */
+/* ==================== KPIs ==================== */
 .card .fs-1 {
     font-size: 2.5rem !important;
+    color: var(--primary-color);
 }
 
-/* ==== Cards de propiedades ==== */
-.property-card {
-    width: 100%;
-    max-width: 350px;
-    margin: 1rem auto;
-    border-radius: 15px;
-    overflow: hidden;
-    background-color: #fff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.property-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-}
-
-.property-image {
-    height: 180px;
-    background-size: cover;
-    background-position: center;
-}
-
-.property-info {
-    padding: 16px;
-}
-
-.favorite-badge {
-    display: inline-block;
-    background-color: #ff6f61;
-    color: #fff;
-    font-size: 0.75rem;
-    font-weight: 500;
-    padding: 4px 8px;
-    border-radius: 50px;
-    margin-bottom: 10px;
-}
-
-.property-title {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.property-location {
-    font-size: 0.95rem;
-    color: #6c757d;
-    margin-bottom: 8px;
-}
-
-.property-price {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #28a745;
-    margin-bottom: 12px;
-}
-
-.property-rating {
-    font-size: 0.9rem;
-    color: #ffc107;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    margin-bottom: 12px;
-}
-
-.rating-star {
-    font-size: 1rem;
-}
-
-/* ==== Botón de reservar ==== */
-.btn-reservar {
-    display: block;
-    width: 100%;
-    padding: 10px 0;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: white;
-    background-color: #007bff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.btn-reservar:hover {
-    background-color: #0056b3;
-}
-
+/* ==================== HEADER ==================== */
 header {
-    background: linear-gradient(135deg, #00b894, #0984e3); /* Verde a azul */
-    color: white;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: var(--white);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Aseguramos que el texto se vea bien sobre el fondo */
-header span,
-header a {
-    color: white !important;
-}
-
-/* Logo con margen si querés mejorar el espaciado */
-header .logo-img {
-    height: 40px;
-    margin-right: 0.5rem;
-}
-
-/* Circulo de iniciales sobre el fondo degradado */
+/* Iniciales del usuario */
 #initials-name {
     background-color: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(4px);
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-/* ==== Improved Tabs Styling ==== */
+/* ==================== NAV TABS ==================== */
 #dashboardTabs {
     background: rgba(255, 255, 255, 0.7);
-    border-radius: 16px;
-    padding: 15px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    padding: 15px;
     margin: 25px auto;
     max-width: 95%;
     display: flex;
@@ -162,68 +85,76 @@ header .logo-img {
 }
 
 #dashboardTabs .nav-link {
-    background-color: white;
-    color: #495057;
+    background-color: var(--white);
+    color: var(--text-dark);
     border-radius: 8px;
     padding: 10px 20px;
     font-weight: 500;
     transition: all 0.3s ease;
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--gray-border);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    display: flex;
-    align-items: center;
-    min-width: 120px;
-    justify-content: center;
-}
-
-
-#dashboardTabs .nav-link:hover {
-    background-color: #f1f3f5;
-    color: #212529;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 #dashboardTabs .nav-link.active {
-    background: linear-gradient(135deg, #0984e3, #00b894);
-    color: white !important;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: var(--white) !important;
     border-color: transparent;
-    box-shadow: 0 4px 12px rgba(9, 132, 227, 0.3);
+    box-shadow: 0 4px 12px var(--primary-light);
+}
+
+#dashboardTabs .nav-link:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+/* ==================== BOTÓN LOGOUT ==================== */
+#logout-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 5px;
+    background: linear-gradient(135deg, var(--danger-color), #b02a37);
+    color: var(--white);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+#logout-btn:hover {
     transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
 }
 
-#dashboardTabs .nav-link i {
-    font-size: 1.1rem;
-    margin-right: 8px;
+/* ==================== MODO OSCURO TOGGLE ==================== */
+#dark-mode-toggle {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--white);
+    transition: transform 0.3s ease;
+}
+#dark-mode-toggle:hover {
+    transform: scale(1.1);
 }
 
-/* Responsive adjustments */
+/* ==================== RESPONSIVE ==================== */
 @media (max-width: 992px) {
     #dashboardTabs {
         flex-wrap: wrap;
         justify-content: flex-start;
         padding: 8px;
     }
-    
+
     #dashboardTabs .nav-link {
         padding: 8px 12px;
         font-size: 0.9rem;
         min-width: auto;
     }
 }
+@media (max-width: 768px) {
+    .card-title {
+        font-size: 1.5rem;
+    }
 
-/* Logout Button Styles */
-#logout-btn {
-    padding: 8px 16px;
-    font-size: 14px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    background-color: #dc3545; /* Danger color */
-    color: white;
-    border: none;
-}
-
-#logout-btn:hover {
-    background-color: #c82333; /* Slightly darker red on hover */
-    cursor: pointer;
+    .property-card {
+        max-width: 100%;
+    }
 }
