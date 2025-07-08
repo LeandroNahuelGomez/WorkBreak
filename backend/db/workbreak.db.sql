@@ -23,24 +23,39 @@ CREATE TABLE usuarios (
   FOREIGN KEY (rol_id) REFERENCES roles(rol_id)
 );
 
--- Product type table
-CREATE TABLE tipo_producto (
-  tipo_id INT AUTO_INCREMENT PRIMARY KEY,
-  nombre VARCHAR(50) NOT NULL,
-  icono_url VARCHAR(255)
+-- Reservation table
+CREATE TABLE reserva (
+  reserva_id INT AUTO_INCREMENT PRIMARY KEY,
+  producto_id INT NOT NULL,
+  hora_llegada TIME NOT NULL,
+  hora_salida TIME NOT NULL,
+  cantidad_personas INT NOT NULL,
+  monto_total DECIMAL(10,2) NOT NULL,
+  registro_fecha_reserva DATETIME DEFAULT CURRENT_TIMESTAMP,
+  dia_reserva DATE NOT NULL,
+  nombre_usuario VARCHAR(100) NOT NULL,
+  FOREIGN KEY (producto_id) REFERENCES producto(producto_id)
 );
 
--- Products table
-CREATE TABLE producto (
-  producto_id INT AUTO_INCREMENT PRIMARY KEY,
-  tipo_producto_id INT NOT NULL,
-  titulo VARCHAR(255) NOT NULL,
-  descripcion TEXT,
-  capacidad INT,
-  normas TEXT,
-  activo BOOLEAN DEFAULT TRUE,
-  fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (tipo_producto_id) REFERENCES tipo_producto(tipo_id),
+-- Ticket table
+CREATE TABLE ticket (
+  ticket_id INT AUTO_INCREMENT PRIMARY KEY,
+  reserva_id INT NOT NULL,
+  fecha_emision DATETIME DEFAULT CURRENT_TIMESTAMP,
+  estado ENUM('generado', 'utilizado') DEFAULT 'generado',
+  qr_url VARCHAR(255),
+  nombre_usuario TEXT NOT NULL,
+  FOREIGN KEY (reserva_id) REFERENCES reserva(reserva_id)
+);
+
+-- Product attributes table
+CREATE TABLE atributo_producto (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  producto_id INT,
+  nombre_atributo VARCHAR(50),
+  valor TEXT,
+  tipo_dato VARCHAR(20),
+  FOREIGN KEY (producto_id) REFERENCES producto(producto_id)
 );
 
 -- Location table
@@ -55,15 +70,32 @@ CREATE TABLE ubicacion (
   FOREIGN KEY (producto_id) REFERENCES producto(producto_id)
 );
 
--- Product attributes table
-CREATE TABLE atributo_producto (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  producto_id INT,
-  nombre_atributo VARCHAR(50),
-  valor TEXT,
-  tipo_dato VARCHAR(20),
-  FOREIGN KEY (producto_id) REFERENCES producto(producto_id)
+-- Products table
+CREATE TABLE producto (
+  producto_id INT AUTO_INCREMENT PRIMARY KEY,
+  tipo_producto_id INT NOT NULL,
+  titulo VARCHAR(255) NOT NULL,
+  descripcion TEXT,
+  capacidad INT,
+  normas TEXT,
+  activo BOOLEAN DEFAULT TRUE,
+  fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+  precio_hora DECIMAL(10,2),
+  imagen VARCHAR(255),
+  FOREIGN KEY (tipo_producto_id) REFERENCES tipo_producto(tipo_id),
 );
+
+-- Product type table
+CREATE TABLE tipo_producto (
+  tipo_id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(50) NOT NULL,
+  icono_url VARCHAR(255)
+);
+
+
+
+
+
 
 -- Audit table
 CREATE TABLE auditoria (
@@ -77,41 +109,10 @@ CREATE TABLE auditoria (
   FOREIGN KEY (usuario_id) REFERENCES usuarios(usuario_id)
 );
 
--- Reservation table
-CREATE TABLE reserva (
-  reserva_id INT AUTO_INCREMENT PRIMARY KEY,
-  producto_id INT NOT NULL,
-  fecha_inicio DATE NOT NULL,
-  fecha_fin DATE NOT NULL,
-  cantidad_personas INT,
-  monto_total DECIMAL(10,2),
-  fecha_reserva DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (producto_id) REFERENCES producto(producto_id)
-);
 
--- 1. Primero agregamos la nueva columna dia_reserva
-ALTER TABLE reserva ADD COLUMN dia_reserva DATE;
 
--- 2. Actualizamos la nueva columna con valores basados en fecha_inicio (asumiendo que contiene la fecha)
-UPDATE reserva SET dia_reserva = DATE(fecha_inicio);
 
--- 3. Renombramos y cambiamos el tipo de las columnas de fecha a hora
-ALTER TABLE reserva 
-CHANGE COLUMN fecha_inicio hora_llegada TIME,
-CHANGE COLUMN fecha_fin hora_salida TIME,
-CHANGE COLUMN fecha_reserva registro_fecha_reserva DATETIME;
 
--- Ticket table
-CREATE TABLE ticket (
-  ticket_id INT AUTO_INCREMENT PRIMARY KEY,
-  reserva_id INT NOT NULL,
-  codigo_ticket VARCHAR(20) NOT NULL UNIQUE,
-  fecha_emision DATETIME DEFAULT CURRENT_TIMESTAMP,
-  estado ENUM('generado', 'pagado', 'cancelado', 'utilizado') DEFAULT 'generado',
-  qr_url VARCHAR(255),
-  detalles TEXT,
-  FOREIGN KEY (reserva_id) REFERENCES reserva(reserva_id)
-);
 
 -- -- Indexes for better performance
 -- CREATE INDEX idx_producto_tipo ON producto(tipo_producto_id);
