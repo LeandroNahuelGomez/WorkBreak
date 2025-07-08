@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" width="120"/>
+  <img src="frontend\img\Logo_Workbreak (1).ico" width="120"/>
 </p>
 
 <h1 align="center">🚀 WorkBreak - Sistema de Autoservicio Digital</h1>
