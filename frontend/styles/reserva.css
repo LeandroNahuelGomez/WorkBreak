@@ -1,173 +1,287 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+:root {
+    --primary-color: #f59e0b;
+    --primary-light: #fbbf24;
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
+    --white: #ffffff;
+    --bg-light: #f9fafb;
+    --gray-border: #d1d5db;
+    --hover-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    --danger-color: #ff5c5c;
+    --danger-hover: #e54848;
+
+    /* Colores para modo oscuro */
+    --dark-bg: #121212;
+    --dark-card: #1e1e1e;
+    --dark-text: #e0e0e0;
+    --dark-text-light: #a0a0a0;
+    --dark-border: #333333;
+}
+
+/* Modo oscuro */
+body.dark-mode {
+    --primary-color: #6a11cb;
+    --primary-light: #2575fc;
+    background-color: var(--dark-bg);
+    color: var(--dark-text);
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f7f7f7;
-  color: #2c3e50;
-  padding: 2rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    padding: 2rem;
+    min-height: 100vh;
+    transition: background-color 0.3s, color 0.3s;
 }
 
-/* Título */
+/* Header - Manteniendo el estilo del dashboard */
+.app-header {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--gray-border);
+}
+
+body.dark-mode .app-header {
+    border-bottom-color: var(--dark-border);
+}
+
+.logo-img {
+    height: 50px;
+    width: auto;
+    filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.2));
+}
+
+.logo-text {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--text-dark);
+    margin-left: 0.8rem;
+}
+
+body.dark-mode .logo-text {
+    color: var(--dark-text);
+}
+
+.student-names {
+    margin-left: auto;
+    font-size: 1rem;
+    color: var(--text-light);
+}
+
+body.dark-mode .student-names {
+    color: var(--dark-text-light);
+}
+
+.theme-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: var(--text-dark);
+    margin-left: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+body.dark-mode .theme-toggle {
+    color: var(--dark-text);
+}
+
+/* Títulos */
 h1 {
-  font-size: 2rem;
-  margin-bottom: 2rem;
-  color: #222;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    color: var(--text-dark);
 }
 
-/* Lista de reservas */
+body.dark-mode h1 {
+    color: var(--dark-text);
+}
+
+/* Tarjetas de reservas - Estilo consistente con el dashboard */
 #lista-reservas {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
 }
 
-/* Tarjeta horizontal */
 .reserva-card {
-  display: flex;
-  justify-content: space-between;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin: 20px 0;
-  overflow: hidden;
-  padding: 20px;
-  align-items: center;
+    background-color: var(--white);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    border: 1px solid var(--gray-border);
+}
+
+body.dark-mode .reserva-card {
+    background-color: var(--dark-card);
+    border-color: var(--dark-border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .reserva-card:hover {
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+    box-shadow: var(--hover-shadow);
 }
 
-/* Parte izquierda (texto) */
 .reserva-info {
-  padding: 1.5rem;
-  flex: 2;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+    padding: 1.5rem;
+    flex: 1;
 }
 
 .reserva-info h3 {
-  font-size: 1.4rem;
-  margin-bottom: 1rem;
-  color: #34495e;
+    font-size: 1.3rem;
+    margin-bottom: 0.8rem;
+    color: var(--text-dark);
+}
+
+body.dark-mode .reserva-info h3 {
+    color: var(--dark-text);
 }
 
 .reserva-info p {
-  margin: 0.3rem 0;
-  font-size: 0.95rem;
-  color: #555;
+    color: var(--text-light);
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
 }
 
-/* Parte derecha (imagen) */
+body.dark-mode .reserva-info p {
+    color: var(--dark-text-light);
+}
+
 .reserva-card img {
-  width: 240px;
-  object-fit: cover;
-  height: 100%;
+    width: 240px;
+    height: 100%;
+    object-fit: cover;
 }
 
-/* Pie de tarjeta: avatar + botón */
-.card-footer {
-  margin-top: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.avatar-group {
-  display: flex;
-  gap: -10px;
-}
-
-.avatar-group img {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 2px solid white;
-}
-
-.btn-huespedes {
-  background: #e67e22;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background 0.3s ease;
-}
-
-.btn-huespedes:hover {
-  background: #cf711c;
-}
-
+/* Botones - Estilo consistente con el dashboard */
 .btn-group {
-  display: flex;
-  gap: 10px;
-  margin-top: 15px;
+    display: flex;
+    gap: 0.8rem;
+    margin-top: 1rem;
 }
 
 .btn-hora,
-.btn-eliminar {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  font-size: 14px;
+.btn-eliminar,
+.btn-huespedes {
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
 }
 
 .btn-hora {
-  background-color: #f0f0f0;
-  color: #333;
+    background-color: var(--gray-border);
+    color: var(--text-dark);
 }
 
 .btn-hora:hover {
-  background-color: #d0d0d0;
+    background-color: var(--text-light);
+    color: var(--white);
+    transform: translateY(-2px);
 }
 
 .btn-eliminar {
-  background-color: #ff5c5c;
-  color: white;
+    background-color: var(--danger-color);
+    color: var(--white);
 }
 
 .btn-eliminar:hover {
-  background-color: #e54848;
+    background-color: var(--danger-hover);
+    transform: translateY(-2px);
 }
 
+.btn-huespedes {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: var(--white);
+}
+
+.btn-huespedes:hover {
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+    transform: translateY(-2px);
+}
+
+/* Footer con botones */
 .finalizar-container {
-    margin-top: 30px;
-    text-align: center;
+    margin-top: 3rem;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
 }
 
-#btn-finalizar {
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
-    color: white;
+#btn-finalizar,
+#btn-volver {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: var(--white);
     border: none;
-    padding: 15px 40px;
-    font-size: 1.2rem;
+    padding: 0.8rem 2rem;
+    font-size: 1.1rem;
     font-weight: 600;
-    border-radius: 30px;
+    border-radius: 8px;
     cursor: pointer;
-    box-shadow: 0 8px 15px rgba(37, 117, 252, 0.4);
     transition: all 0.3s ease;
-    user-select: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-#btn-finalizar:hover {
-    background: linear-gradient(135deg, #2575fc, #6a11cb);
-    box-shadow: 0 12px 20px rgba(37, 117, 252, 0.6);
+#btn-finalizar:hover,
+#btn-volver:hover {
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
     transform: translateY(-3px);
+    box-shadow: var(--hover-shadow);
 }
 
-#btn-finalizar:active {
+#btn-finalizar:active,
+#btn-volver:active {
     transform: translateY(1px);
-    box-shadow: 0 6px 10px rgba(37, 117, 252, 0.3);
 }
 
+/* Avatar group */
+.avatar-group {
+    display: flex;
+}
 
+.avatar-group img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--white);
+    margin-right: -10px;
+}
+
+body.dark-mode .avatar-group img {
+    border-color: var(--dark-card);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .reserva-card {
+        flex-direction: column;
+    }
+    
+    .reserva-card img {
+        width: 100%;
+        height: 200px;
+    }
+    
+    .app-header {
+        flex-wrap: wrap;
+    }
+    
+    .student-names {
+        margin-left: 0;
+        width: 100%;
+        order: 3;
+        margin-top: 1rem;
+    }
+}

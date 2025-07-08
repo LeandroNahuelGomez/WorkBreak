@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     reservas.forEach((res) => {
+        const imagen = "../../backend/db/image/1696536427-coworking-spaces-hybrid-world-1023-g1437209221.jpg";
         const card = document.createElement("div");
         card.className = "reserva-card";
         card.innerHTML = `
@@ -26,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     </div>
   </div>
-  <img src="../img/productos/${res.imagen}" alt="${res.titulo}">
+  <img src="${imagen}">
 `;
 
         contenedor.appendChild(card);
@@ -67,75 +68,89 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const btnFinalizar = document.getElementById("btn-finalizar");
 
-    btnFinalizar.addEventListener("click", async () => {
-        // Obtener las reservas desde localStorage
-        const reservasStr = localStorage.getItem('reservas');
-        console.log('Reservas a enviar:', reservasStr);
+    btnFinalizar.addEventListener("click", () => {
+        const modal = new bootstrap.Modal(document.getElementById("modalConfirmarFinalizar"));
+        modal.show();
+    });
 
-        if (!reservasStr) {
-            alert("No hay reservas para enviar.");
-            return;
-        }
+    async function finalizarReservas() {
+        {
+            // Obtener las reservas desde localStorage
+            const reservasStr = localStorage.getItem('reservas');
+            console.log('Reservas a enviar:', reservasStr);
 
-        let reservas;
-
-        try {
-            reservas = JSON.parse(reservasStr);
-            console.log('Reservas parseadas:', reservas);
-        } catch {
-            alert("Error al leer las reservas guardadas.");
-            return;
-        }
-
-        if (!Array.isArray(reservas) || reservas.length === 0) {
-            alert("No hay reservas válidas para enviar.");
-            return;
-        }
-
-        try {
-            // Pero si tu API sólo acepta una por vez, hacés un loop:
-            for (const reservaData of reservas) {
-                console.log(reservaData.nombreUsuario);
-                // CONVERSIÓN: Ajustar los datos antes de enviar
-                const diaReservaDate = new Date(reservaData.diaReserva); // Asegura que sea objeto Date
-                const montoTotal = parseFloat(reservaData.monto_total || reservaData.total);
-                const cantPersonas = parseInt(reservaData.cantidad_personas || reservaData.cantPersonas);
-
-                // Armar objeto compatible con la API
-                const datosParaEnviar = {
-                    producto_id: parseInt(reservaData.producto_id), // o reservaData.producto_id si ya lo tenés así
-                    dia_reserva: diaReservaDate,
-                    hora_llegada: reservaData.horaEntrada,
-                    hora_salida: reservaData.horaSalida,
-                    cantidad_personas: cantPersonas,
-                    monto_total: montoTotal,
-                    nombre_usuario: reservaData.nombreUsuario
-                };
-
-                console.log('Datos a enviar:', datosParaEnviar);
-
-                const reservaCreada = await apiClient.fetchAPI('reserva', {
-                    method: 'POST',
-                    body: JSON.stringify(datosParaEnviar)
-                });
-
-                localStorage.setItem("reserva_id_creada", reservaCreada.reserva_id);
+            if (!reservasStr) {
+                alert("No hay reservas para enviar.");
+                return;
             }
 
-            console.log('Todas las reservas guardadas con éxito.');
-            // Limpiar reservas para evitar reenviar
-            // localStorage.removeItem('reservas');
+            let reservas;
 
-            // Redirigir a ticket o página confirmación
-            window.location.href = "../../frontend/pages/ticket.html";
+            try {
+                reservas = JSON.parse(reservasStr);
+                console.log('Reservas parseadas:', reservas);
+            } catch {
+                alert("Error al leer las reservas guardadas.");
+                return;
+            }
 
-        } catch (error) {
-            console.error('Error al guardar reservas:', error.message);
-            alert("Error al guardar las reservas. Por favor, intente nuevamente.");
+            if (!Array.isArray(reservas) || reservas.length === 0) {
+                alert("No hay reservas válidas para enviar.");
+                return;
+            }
+
+            try {
+                // Pero si tu API sólo acepta una por vez, hacés un loop:
+                for (const reservaData of reservas) {
+                    console.log(reservaData.nombreUsuario);
+                    // CONVERSIÓN: Ajustar los datos antes de enviar
+                    const diaReservaDate = new Date(reservaData.diaReserva); // Asegura que sea objeto Date
+                    const montoTotal = parseFloat(reservaData.monto_total || reservaData.total);
+                    const cantPersonas = parseInt(reservaData.cantidad_personas || reservaData.cantPersonas);
+
+                    // Armar objeto compatible con la API
+                    const datosParaEnviar = {
+                        producto_id: parseInt(reservaData.producto_id), // o reservaData.producto_id si ya lo tenés así
+                        dia_reserva: diaReservaDate,
+                        hora_llegada: reservaData.horaEntrada,
+                        hora_salida: reservaData.horaSalida,
+                        cantidad_personas: cantPersonas,
+                        monto_total: montoTotal,
+                        nombre_usuario: reservaData.nombreUsuario
+                    };
+
+                    console.log('Datos a enviar:', datosParaEnviar);
+
+                    const reservaCreada = await apiClient.fetchAPI('reserva', {
+                        method: 'POST',
+                        body: JSON.stringify(datosParaEnviar)
+                    });
+
+                    localStorage.setItem("reserva_id_creada", reservaCreada.reserva_id);
+                }
+
+                console.log('Todas las reservas guardadas con éxito.');
+                // Limpiar reservas para evitar reenviar
+                // localStorage.removeItem('reservas');
+
+                // Redirigir a ticket o página confirmación
+                window.location.href = "../../frontend/pages/ticket.html";
+
+            } catch (error) {
+                console.error('Error al guardar reservas:', error.message);
+                alert("Error al guardar las reservas. Por favor, intente nuevamente.");
+            }
         }
+    }
+
+    document.getElementById("btnConfirmarFinalizar").addEventListener("click", () => {
+        const modal = bootstrap.Modal.getInstance(document.getElementById("modalConfirmarFinalizar"));
+        modal.hide();
+        finalizarReservas(); // Llamamos a la función real
     });
 
 });
+
 
 
 // Función para actualizar la reserva en localStorage
@@ -146,3 +161,37 @@ function actualizarReserva(reservas, reservaActualizada) {
         localStorage.setItem("reservas", JSON.stringify(reservas));
     }
 }
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Obtener el valor del localStorage o establecer por defecto
+    const darkMode = localStorage.getItem('darkMode') === 'true';
+
+    // Aplicar el tema inicial
+    setTheme(darkMode);
+
+    // Configurar el botón de alternancia (si existe)
+    setupThemeToggle();
+});
+
+function setTheme(isDark) {
+    // Aplicar/remover la clase dark-mode al body
+    document.body.classList.toggle('dark-mode', isDark);
+
+    // Actualizar el localStorage
+    localStorage.setItem('darkMode', isDark);
+}
+
+function setupThemeToggle() {
+    const themeToggle = document.querySelector('.theme-toggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', function () {
+            const isDark = !document.body.classList.contains('dark-mode');
+            setTheme(isDark);
+        });
+    }
+}
+
+document.getElementById("btn-volver").addEventListener("click", () => {
+    window.location.href = "../pages/dashboard-user.html"; // Cambialo por el destino deseado
+});

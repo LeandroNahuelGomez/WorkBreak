@@ -33,6 +33,10 @@ module.exports = (sequelize, DataTypes) => {
     fecha_creacion: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW
+    }, 
+    imagen: {
+      type: DataTypes.STRING, // guarda el nombre del archivo o la ruta relativa
+      allowNull: true
     },
     // Aquí agregamos el nuevo campo
     precio_hora: {

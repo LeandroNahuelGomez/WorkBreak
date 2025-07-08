@@ -12,12 +12,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     producto = await apiClient.fetchAPI(`productos/${id}`);
+    // ubicaciones = await apiClient.fetchAPI(`ubicacion/`);
+
+    // Buscar la ubicación que coincida con el producto_id
+    // const ubicacionCoincidente = ubicaciones.find(u => u.producto_id === producto.producto_id);
 
     // Titulo y ubicación
     document.querySelector("title").textContent = `${producto.titulo} - WorkBreak`;
     document.querySelector("h1").textContent = producto.titulo;
-    const ubicacion = producto.ubicacion || "Ubicación no disponible";
-    document.querySelector(".info-section p").innerHTML = `<i class='fas fa-map-marker-alt'></i> ${ubicacion}`;
+    document.querySelector(".info-section p").innerHTML = `<i class='fas fa-map-marker-alt'></i> ${"Ciudad no disponible"}`;
 
     // Descripción y normas
     document.querySelector(".description p").textContent = producto.normas || "Sin descripción detallada.";
@@ -26,8 +29,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     //Esto traer desde bd precioxhora tendria que ser
     const pricePerNight = parseFloat(producto.precio_hora) || 50;
     const nights = 2;
-    const limpieza = 10;
-    const servicio = 5;
+    const limpieza = 0;
+    const servicio = 0;
     const subtotal = pricePerNight * nights;
     const total = subtotal + limpieza + servicio;
 
@@ -43,13 +46,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Imagen principal y thumbnails
     const mainImg = document.querySelector(".main-image");
-    mainImg.style.backgroundImage = `url('${producto.imagen || "https://source.unsplash.com/featured/?workspace"}')`;
+    const imagen = "../../backend/db/image/1696536427-coworking-spaces-hybrid-world-1023-g1437209221.jpg";
+    mainImg.style.backgroundImage = `url('${imagen}')`;
 
-    const thumbnails = document.querySelectorAll(".thumbnail");
-    thumbnails.forEach((thumb, i) => {
-      const imagenes = producto.imagenes || [];
-      thumb.style.backgroundImage = `url('${imagenes[i] || producto.imagen || "https://source.unsplash.com/random/200x200?office"}')`;
-    });
 
   } catch (err) {
     console.error("Error al cargar el producto:", err);
@@ -57,8 +56,26 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
+// Función para verificar disponibilidad
+async function verificarDisponibilidad(producto_id, fecha, hora_entrada, hora_salida) {
+  try {
+    const params = new URLSearchParams({
+      producto_id: producto_id,
+      fecha: fecha,
+      hora_entrada: hora_entrada,
+      hora_salida: hora_salida
+    });
 
-document.getElementById("form-reserva").addEventListener("submit", (e) => {
+    const response = await apiClient.fetchAPI(`reserva/disponibilidad?${params.toString()}`);
+    return response;
+  } catch (error) {
+    console.error("Error al verificar disponibilidad:", error);
+    throw error;
+  }
+}
+
+
+document.getElementById("form-reserva").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const diaReserva = document.getElementById("fecha").value;
@@ -80,27 +97,103 @@ document.getElementById("form-reserva").addEventListener("submit", (e) => {
     return;
   }
 
-  // Guardar reserva en localStorage (puede adaptarse a API POST si tenés backend)
-  const reservas = JSON.parse(localStorage.getItem("reservas")) || [];
+  // Mostrar loader o deshabilitar botón mientras se verifica
+  const submitButton = e.target.querySelector('button[type="submit"]');
+  const originalText = submitButton.textContent;
+  submitButton.disabled = true;
+  submitButton.textContent = "Verificando disponibilidad...";
 
-  const nuevaReserva = {
-    producto_id: producto.producto_id,
-    titulo: producto.titulo,
-    imagen: producto.imagen,
-    //Cantidad de personas este mal hecho lo tenemos que traer desde el select option
-    cantidad_personas: cantidadPersonas,
-    diaReserva,
-    horaEntrada,
-    horaSalida,
-    duracionHoras,
-    precioHora: producto.precio_hora,
-    monto_total: duracionHoras * producto.precio_hora,
-    nombreUsuario: localStorage.getItem("nombreUsuario") || "Usuario Anónimo"
-  };
+  try {
+    // Verificar disponibilidad antes de procesar la reserva
+    const disponibilidad = await verificarDisponibilidad(
+      producto.producto_id,
+      diaReserva,
+      horaEntrada,
+      horaSalida
+    );
 
-  reservas.push(nuevaReserva);
-  localStorage.setItem("reservas", JSON.stringify(reservas));
+    console.log("Disponibilidad:", disponibilidad);
 
-//   Redirigir
-  window.location.href = "../pages/dashboard-user.html";
+    if (!disponibilidad.disponible) {
+      // Mostrar el modal con el mensaje
+      const modalBody = document.getElementById("modalConflictoBody");
+      modalBody.textContent = "Horario no disponible. Por favor, elige otro dia u horario.";
+
+      const modal = new bootstrap.Modal(document.getElementById('modalConflicto'));
+      modal.show();
+      return;
+    }
+
+    // Si está disponible, proceder con la reserva
+    const reservas = JSON.parse(localStorage.getItem("reservas")) || [];
+
+    const nuevaReserva = {
+      producto_id: producto.producto_id,
+      titulo: producto.titulo,
+      imagen: producto.imagen,
+      cantidad_personas: cantidadPersonas,
+      diaReserva,
+      horaEntrada,
+      horaSalida,
+      duracionHoras,
+      precioHora: producto.precio_hora,
+      monto_total: duracionHoras * producto.precio_hora,
+      nombreUsuario: localStorage.getItem("nombreUsuario") || "Usuario Anónimo"
+    };
+
+    reservas.push(nuevaReserva);
+    localStorage.setItem("reservas", JSON.stringify(reservas));
+
+    // Redirigir solo si la reserva fue exitosa
+    window.location.href = "../pages/dashboard-user.html";
+
+  } catch (error) {
+    console.error("Error al procesar la reserva:", error);
+    alert("Error al procesar la reserva. Por favor, intenta nuevamente.");
+  } finally {
+    // Restaurar el botón
+    submitButton.disabled = false;
+    submitButton.textContent = originalText;
+  }
+});
+
+
+document.getElementById('volverAtras-btn').addEventListener('click', function (e) {
+  e.preventDefault();
+
+  // Redirigir a login
+  window.location.href = 'dashboard-user.html';
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  // Obtener el valor del localStorage o establecer por defecto
+  const darkMode = localStorage.getItem('darkMode') === 'true';
+
+  // Aplicar el tema inicial
+  setTheme(darkMode);
+
+  // Configurar el botón de alternancia (si existe)
+  setupThemeToggle();
+});
+
+function setTheme(isDark) {
+  // Aplicar/remover la clase dark-mode al body
+  document.body.classList.toggle('dark-mode', isDark);
+
+  // Actualizar el localStorage
+  localStorage.setItem('darkMode', isDark);
+}
+
+function setupThemeToggle() {
+  const themeToggle = document.querySelector('.theme-toggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('click', function () {
+      const isDark = !document.body.classList.contains('dark-mode');
+      setTheme(isDark);
+    });
+  }
+}
+
+document.getElementById("volverAtras-btn").addEventListener("click", () => {
+  window.location.href = "../pages/dashboard-user.html"; // Cambialo por el destino deseado
 });
