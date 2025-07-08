@@ -29,7 +29,7 @@ function mostrarPagina(pagina) {
 
 function renderizarPaginacion() {
     const totalPaginas = Math.ceil(espaciosFiltrados.length / productosPorPagina);
-    
+
     // Buscar o crear contenedor de paginación separado
     let contenedorPaginacion = document.getElementById("contenedor-paginacion");
     if (!contenedorPaginacion) {
@@ -42,7 +42,7 @@ function renderizarPaginacion() {
             margin-top: 30px;
             padding: 20px 0;
         `;
-        
+
         // Insertar después del contenedor de espacios
         const contenedorEspacios = document.getElementById("espacios-populares");
         contenedorEspacios.parentNode.insertBefore(contenedorPaginacion, contenedorEspacios.nextSibling);
@@ -99,7 +99,7 @@ function renderizarPaginacion() {
     const maxPaginasVisibles = 5;
     let inicio = Math.max(1, paginaActual - Math.floor(maxPaginasVisibles / 2));
     let fin = Math.min(totalPaginas, inicio + maxPaginasVisibles - 1);
-    
+
     if (fin - inicio < maxPaginasVisibles - 1) {
         inicio = Math.max(1, fin - maxPaginasVisibles + 1);
     }
@@ -108,7 +108,7 @@ function renderizarPaginacion() {
         const btnPagina = document.createElement("button");
         btnPagina.textContent = i;
         btnPagina.classList.add("btn-paginacion");
-        
+
         const esActual = i === paginaActual;
         btnPagina.style.cssText = `
             padding: 0.8rem 1rem;
@@ -123,16 +123,16 @@ function renderizarPaginacion() {
             transition: all 0.3s ease;
             box-shadow: ${esActual ? '0 2px 8px rgba(0, 0, 0, 0.15)' : 'none'};
         `;
-        
+
         if (esActual) {
             btnPagina.classList.add("active");
         }
-        
+
         btnPagina.onclick = () => {
             paginaActual = i;
             mostrarPagina(paginaActual);
         };
-        
+
         if (!esActual) {
             btnPagina.onmouseover = () => {
                 btnPagina.style.background = "linear-gradient(135deg, var(--primary-color), var(--primary-light))";
@@ -147,7 +147,7 @@ function renderizarPaginacion() {
                 btnPagina.style.boxShadow = "none";
             };
         }
-        
+
         paginacionDiv.appendChild(btnPagina);
     }
 
@@ -260,7 +260,7 @@ async function cargarEspacios() {
 
         espaciosCargados = activos;
         console.log("Espacios cargados:", espaciosCargados);
-        
+
         // Usar la función unificada
         aplicarFiltrosYMostrar(espaciosCargados);
     } catch (error) {
@@ -348,4 +348,12 @@ document.addEventListener("DOMContentLoaded", () => {
             searchBtn.click();
         }
     });
+
+    const logoutBtn = document.getElementById("logout-btn");
+
+    logoutBtn.addEventListener("click", () => {
+        localStorage.removeItem("nombreUsuario"); // o lo que uses para autenticar
+        window.location.href = "login-user.html"; // o login.html si corresponde
+    });
 });
+
