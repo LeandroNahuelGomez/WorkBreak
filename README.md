@@ -59,16 +59,6 @@ WorkBreak ofrece **dos grandes categorías de espacios**:
 
 ---
 
-## 🖥️ Capturas de pantalla
-
-<div align="center">
-  <img src="Capturas/welcome.png" width="300" />
-  <img src="Capturas/reserva.png" width="300" />
-  <img src="Capturas/ticket.png" width="300" />
-</div>
-
----
-
 ## 🧾 Flujo del Usuario
 
 ### 👤 Cliente:
