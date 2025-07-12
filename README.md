@@ -5,7 +5,7 @@
 <h1 align="center">🚀 WorkBreak - Sistema de Autoservicio Digital</h1>
 
 <p align="center">
-  <strong>Leandro Nahiel Gómez</strong><br/>
+  <strong>Leandro Nahuel Gómez</strong><br/>
   💻 Trabajo Integrador Final | 🏫 UTN Avellaneda | 🗓️ Año 2025
 </p>
 
