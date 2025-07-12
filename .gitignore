@@ -1,8 +1,8 @@
 # Node modules
-**/node_modules/
+node_modules/
 
 # Archivos de entorno
-**/.env
+.env
 
 # Archivos del sistema
 .DS_Store
