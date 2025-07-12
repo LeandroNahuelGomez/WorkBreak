@@ -352,8 +352,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const logoutBtn = document.getElementById("logout-btn");
 
     logoutBtn.addEventListener("click", () => {
-        localStorage.removeItem("nombreUsuario"); // o lo que uses para autenticar
-        window.location.href = "login-user.html"; // o login.html si corresponde
+        localStorage.removeItem("nombreUsuario");
+        window.location.href = "login-user.html";
     });
 });
 
