@@ -1,104 +1,657 @@
-// Cargar productos desde la API
-async function cargarProductos(tipoFiltro = null) {
-    const tabla = document.getElementById("tablaProductos");
-    const tbody = tabla.querySelector("tbody");
+// ========================================
+// CLASE PARA MANEJO GLOBAL DE SEGURIDAD
+// ========================================
+class SecurityManager {
+    constructor() {
+        this.token = null;
+        this.isValidatingToken = false;
+        this.redirectTimeout = null;
+        this.init();
+    }
 
-    try {
-        // Mostrar spinner de carga
-        tbody.innerHTML = "<tr><td colspan='10' class='text-center'><div class='spinner-border' role='status'><span class='visually-hidden'>Cargando...</span></div></td></tr>";
+    init() {
+        this.setupTokenValidation();
+        this.setupVisibilityListener();
+        this.setupStorageListener();
+    }
 
-        // Obtener token del localStorage
+    // Verificar token al cargar la página
+    async validateInitialToken() {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            this.redirectToLogin("No hay token disponible");
+            return false;
+        }
+
+        try {
+            // Hacer una petición ligera para verificar si el token es válido
+            const response = await apiClient.fetchAPI("auth/validate", {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            this.token = token;
+            return true;
+        } catch (error) {
+            console.error("Token inválido o expirado:", error);
+            this.handleTokenExpired();
+            return false;
+        }
+    }
+
+    // Configurar validación periódica del token
+    setupTokenValidation() {
+        // Verificar token cada 5 minutos
+        setInterval(() => {
+            this.validateTokenSilently();
+        }, 5 * 60 * 1000);
+    }
+
+    // Verificar token sin interrumpir la experiencia del usuario
+    async validateTokenSilently() {
+        if (this.isValidatingToken) return;
+
         const token = localStorage.getItem("token");
         if (!token) {
-            window.location.href = "login-admin.html";
+            this.handleTokenExpired();
             return;
         }
 
-        // Obtener TODOS los productos
-        const res = await apiClient.fetchAPI("productos", {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`
+        try {
+            this.isValidatingToken = true;
+            await apiClient.fetchAPI("auth/validate", {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+        } catch (error) {
+            console.error("Token expirado en validación silenciosa:", error);
+            this.handleTokenExpired();
+        } finally {
+            this.isValidatingToken = false;
+        }
+    }
+
+    // Manejar token expirado
+    handleTokenExpired() {
+        console.log("Token expirado, redirigiendo al login...");
+
+        // Limpiar storage inmediatamente
+        this.clearSession();
+
+        // Mostrar mensaje al usuario
+        this.showTokenExpiredMessage();
+
+        // Redirigir después de un breve delay
+        this.redirectToLogin("Token expirado");
+    }
+
+    // Limpiar sesión completamente
+    clearSession() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('userData');
+        this.token = null;
+    }
+
+    // Mostrar mensaje de token expirado
+    showTokenExpiredMessage() {
+        // Crear overlay de mensaje
+        const overlay = document.createElement('div');
+        overlay.id = 'token-expired-overlay';
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            font-size: 18px;
+            text-align: center;
+        `;
+
+        overlay.innerHTML = `
+            <div style="background: #dc3545; padding: 20px; border-radius: 10px; max-width: 400px;">
+                <h4>Sesión Expirada</h4>
+                <p>Su sesión ha expirado. Será redirigido al login...</p>
+                <div class="spinner-border text-light" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+    }
+
+    // Redirigir a login con mensaje
+    redirectToLogin(reason = "") {
+        if (this.redirectTimeout) {
+            clearTimeout(this.redirectTimeout);
+        }
+
+        this.redirectTimeout = setTimeout(() => {
+            console.log(`Redirigiendo a login: ${reason}`);
+            window.location.href = "login-admin.html";
+        }, 2000); // 2 segundos para que el usuario vea el mensaje
+    }
+
+    // Interceptar respuestas 401 globalmente
+    setupResponseInterceptor() {
+        // Sobrescribir fetch para interceptar respuestas 401
+        const originalFetch = window.fetch;
+
+        window.fetch = async (...args) => {
+            try {
+                const response = await originalFetch(...args);
+
+                if (response.status === 401) {
+                    console.warn("Respuesta 401 interceptada");
+                    this.handleTokenExpired();
+                }
+
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        };
+    }
+
+    // Escuchar cambios en el localStorage (para múltiples pestañas)
+    setupStorageListener() {
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'token' && !e.newValue) {
+                console.log("Token removido en otra pestaña");
+                this.redirectToLogin("Token removido en otra pestaña");
             }
         });
+    }
 
-        console.log("Respuesta de API productos:", res);
+    // Verificar token cuando la página vuelve a estar visible
+    setupVisibilityListener() {
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                this.validateTokenSilently();
+            }
+        });
+    }
 
-        // Manejar diferentes formatos de respuesta
-        let productos = [];
-        if (Array.isArray(res)) {
-            productos = res;
-        } else if (res && res.productos) {
-            productos = res.productos;
-        } else if (res && res.data) {
-            productos = res.data; // Para APIs que usan formato {data: [...]}
-        }
+    // Método público para verificar si hay token válido
+    hasValidToken() {
+        return !!localStorage.getItem("token");
+    }
+}
 
-        // Aplicar filtro localmente si se especificó un tipo
-        if (tipoFiltro && !isNaN(tipoFiltro)) {
-            productos = productos.filter(p => p.tipo_producto_id == tipoFiltro);
-        }
+// ========================================
+// CLASE GENÉRICA PARA MANEJO DE TABLAS
+// ========================================
+class TableManager {
+    constructor() {
+        this.configs = new Map()
+        this.securityManager = new SecurityManager(); // Instancia de SecurityManager para verificar el token
+    }
 
-        // Limpiar tabla para mostrar resultados
-        tbody.innerHTML = "";
+    //Registrar configuracion de la tabla
+    registerTable(config) {
+        const {
+            tableId, //tabla a manejar
+            apiEndpoint, //endpoint de la API para obtener los datos
+            dataKey = null, // clave del objeto que contiene los datos (si es necesario)
+            columns, // columnas de la tabla
+            noDataMessage = "No data available", // mensaje a mostrar si no hay datos
+            customRowRenderer = null, // función personalizada para renderizar filas
+            onLoadError = null, // función a ejecutar en caso de error al cargar los datos
+            filterFunction = null // función para filtrar los datos antes de renderizar
+        } = config;
 
-        if (productos.length === 0) {
-            const mensaje = tipoFiltro 
-                ? `No se encontraron productos del tipo ${tipoFiltro}` 
-                : "No se encontraron productos.";
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="10" class="text-center py-4 text-muted">
-                        ${mensaje}
-                    </td>
-                </tr>
-            `;
+        this.configs.set(tableId, {
+            apiEndpoint,
+            dataKey,
+            columns,
+            noDataMessage,
+            customRowRenderer,
+            onLoadError,
+            filterFunction
+        });
+    }
+
+    async loadData(tableId, filter = null) {
+        const config = this.configs.get(tableId);
+        if (!config) {
+            console.error("No se encontró la configuración para la tabla:", tableId);
             return;
         }
 
-        // Mostrar los productos en la tabla
-        productos.forEach(p => {
-            const fila = document.createElement("tr");
-            const estadoTexto = p.activo ? "Activo" : "Inactivo";
-            const estadoClase = p.activo ? "text-success" : "text-danger";
+        const tabla = document.getElementById(tableId);
+        const tbody = tabla.querySelector("tbody");
 
-            fila.innerHTML = `
-                <td>${p.producto_id}</td>
-                <td>${p.tipo_producto_id}</td>
-                <td>${p.titulo}</td>
-                <td>${p.descripcion}</td>
-                <td>${p.capacidad}</td>
-                <td>${p.normas}</td>
-                <td><span class="${estadoClase}">${estadoTexto}</span></td>
-                <td>${p.fecha_creacion}</td>
-                <td>$${p.precio_hora}</td>
-                <td>
-                    <button class="btn btn-sm btn-primary btn-editar-producto" data-id="${p.producto_id}">Editar</button>
-                    ${p.activo ?
-                    `<button class="btn btn-sm btn-warning btn-desactivar-producto ms-1" data-id="${p.producto_id}" data-titulo="${p.titulo}">Desactivar</button>` :
-                    `<button class="btn btn-sm btn-success btn-activar-producto ms-1" data-id="${p.producto_id}" data-titulo="${p.titulo}">Activar</button>`
+        // 1. VERIFICAR TOKEN ANTES DE CUALQUIER ACCIÓN
+        if (!this.securityManager.hasValidToken()) {
+            this.securityManager.handleTokenExpired();
+            return;
+        }
+
+        const token = localStorage.getItem("token");
+
+        //Mostrar Spinner
+        this.showSpinner(tbody, config.columns.length);
+
+        try {
+            //Hacer la petición a la API
+            const res = await apiClient.fetchAPI(config.apiEndpoint, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`
                 }
-                </td>
-            `;
-            tbody.appendChild(fila);
-        });
+            });
 
-        tabla.classList.remove("d-none");
-        document.querySelector("#divListadoProductos .spinner-border")?.remove();
+            console.log("Respuesta de la API:", res);
 
-    } catch (error) {
-        console.error("Error al cargar productos:", error);
+            //Extraer datos de la respuesta
+            let data = this.extractData(res, config.dataKey);
+
+            //Aplicar filtro si se proporciona
+            if (filter && config.filterFunction) {
+                data = config.filterFunction(data, filter);
+            }
+
+            // Remover spinner si existe
+            this.removeSpinner(tbody);
+
+            //Limpiar el cuerpo de la tabla
+            tbody.innerHTML = "";
+
+            //Mostrar datos o mensajes vacio
+            if (data.length === 0) {
+                this.showNoDataMessage(tbody, config.columns.length, config.noDataMessage);
+            } else {
+                this.renderRows(tbody, data, config.columns, config.customRowRenderer);
+            }
+
+            //Mostrar tabla
+            tabla.classList.remove("d-none");
+
+        } catch (error) {
+            console.error("Error al cargar los datos:", error);
+            this.removeSpinner(tbody);
+            // Limpiar tbody antes de mostrar error
+            tbody.innerHTML = "";
+
+            this.showError(tbody, config.columns.length, error.message);
+
+            if (config.onLoadError) {
+                config.onLoadError(error);
+            }
+        }
+    }
+
+    // Extraer datos de diferentes formatos de respuesta
+    extractData(response, dataKey) {
+        if (Array.isArray(response)) {
+            return response; // Si es un array, devolverlo directamente
+        }
+
+        if (dataKey && response[dataKey]) {
+            return response[dataKey]; // Si hay una clave específica, devolver los datos de esa clave
+        }
+
+        //Intentar con claves comunes
+        const commonKeys = ["data", "productos", "usuarios", "reservas", "tickets"];
+        for (const key of commonKeys) {
+            if (response[key]) {
+                return response[key];
+            }
+        }
+
+        return []; // Si no se encuentra nada, devolver un array vacío
+    }
+
+    showSpinner(tbody, columnCount) {
+        tbody.innerHTML = `
+        <tr>
+            <td colspan="${columnCount}" class="text-center">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </td>
+        </tr>
+        `;
+    }
+
+    // Mostrar mensaje cuando no hay datos
+    showNoDataMessage(tbody, columnCount, message) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="10" class="text-center py-4 text-danger">
-                    Error al cargar productos: ${error.message}
+                <td colspan="${columnCount}" class="text-center py-4 text-muted">
+                    ${message}
                 </td>
             </tr>
         `;
     }
+
+    // Mostrar mensaje de error
+    showError(tbody, columnCount, errorMessage) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="${columnCount}" class="text-center py-4 text-danger">
+                    Error al cargar datos: ${errorMessage}
+                </td>
+            </tr>
+        `;
+    }
+
+    // Renderizar filas de la tabla
+    renderRows(tbody, data, columns, customRowRenderer) {
+        data.forEach(item => {
+            const fila = document.createElement("tr");
+
+            if (customRowRenderer) {
+                fila.innerHTML = customRowRenderer(item);
+            } else {
+                const cells = columns.map(col => {
+                    if (typeof col.render === 'function') {
+                        return col.render(item);
+                    }
+                    return `<td>${item[col.key] || ''}</td>`;
+                }).join('');
+                fila.innerHTML = cells;
+            }
+            tbody.appendChild(fila);
+        });
+    }
+
+    // Remover spinner
+    removeSpinner(tbody) {
+        // Método más robusto: remover por clase específica
+        const spinnerRow = tbody.querySelector('.spinner-row');
+        if (spinnerRow) {
+            spinnerRow.remove();
+        }
+
+        // Método de respaldo: buscar por spinner-border
+        const spinner = tbody.querySelector('.spinner-border');
+        if (spinner) {
+            const row = spinner.closest('tr');
+            if (row) {
+                row.remove();
+            }
+        }
+    }
 }
 
-// Clase EditFormManager mejorada
+
+// ========================================
+// INSTANCIA GLOBAL DEL TABLE MANAGER
+// ========================================
+const tableManager = new TableManager();
+
+
+// ========================================
+// CONFIGURACIONES DE TABLAS
+// ========================================
+
+// Configuración para tabla de productos
+tableManager.registerTable({
+    tableId: "tablaProductos",
+    apiEndpoint: "productos",
+    columns: [
+        { key: "producto_id" },
+        { key: "tipo_producto_id" },
+        { key: "titulo" },
+        { key: "descripcion" },
+        { key: "capacidad" },
+        { key: "normas" },
+        {
+            key: "activo",
+            render: (item) => {
+                const estadoTexto = item.activo ? "Activo" : "inactivo";
+                const estadoClase = item.activo ? "text-success" : "text-danger";
+                return `<td class="${estadoClase}">${estadoTexto}</td>`;
+            }
+        },
+        { key: "fecha_creacion" },
+        {
+            key: "precio_hora",
+            render: (item) => `<td>$${item.precio_hora}</td>`
+        }
+    ],
+    noDataMessage: "No se encontraron productos",
+    customRowRenderer: (producto) => `
+        <td>${producto.producto_id}</td>
+        <td>${producto.tipo_producto_id}</td>
+        <td>${producto.titulo}</td>
+        <td>${producto.descripcion}</td>
+        <td>${producto.capacidad}</td>
+        <td>${producto.normas}</td>
+        <td><span class="${producto.activo ? 'text-success' : 'text-danger'}">${producto.activo ? 'Activo' : 'Inactivo'}</span></td>
+        <td>${producto.fecha_creacion}</td>
+        <td>$${producto.precio_hora}</td>
+        <td>
+            <button class="btn btn-sm btn-primary btn-editar-producto" data-id="${producto.producto_id}">Editar</button>
+            ${producto.activo ?
+            `<button class="btn btn-sm btn-warning btn-desactivar-producto ms-1" data-id="${producto.producto_id}" data-titulo="${producto.titulo}">Desactivar</button>` :
+            `<button class="btn btn-sm btn-success btn-activar-producto ms-1" data-id="${producto.producto_id}" data-titulo="${producto.titulo}">Activar</button>`
+        }
+        </td>
+    `,
+    filterFunction: (productos, tipoFiltro) => {
+        if (tipoFiltro && !isNaN(tipoFiltro)) {
+            return productos.filter(producto => producto.tipo_producto_id === parseInt(tipoFiltro));
+        }
+        return productos; // Si no hay filtro, devolver todos los productos
+    }
+})
+
+// Configuración para tabla de empleados
+tableManager.registerTable({
+    tableId: "tablaEmpleados",
+    apiEndpoint: "usuarios",
+    columns: [
+        { key: "usuario_id" },
+        { key: "nombre" },
+        { key: "apellido" },
+        { key: "email" },
+        { key: "rol_id" }
+    ],
+    noDataMessage: "No se encontraron empleados",
+    customRowRenderer: (empleado) => `
+        <td>${empleado.usuario_id}</td>
+        <td>${empleado.nombre}</td>
+        <td>${empleado.apellido}</td>
+        <td>${empleado.email}</td>
+        <td>${empleado.rol_id || "Sin rol"}</td>
+        <td>
+            <button class="btn btn-sm btn-primary btn-editar-usuario" data-id="${empleado.usuario_id}">Editar</button>
+            <button class="btn btn-sm btn-danger btn-eliminar-usuario" data-id="${empleado.usuario_id}" data-nombre="${empleado.nombre}">Eliminar</button>
+        </td>
+    `
+});
+
+//Configuración para tabla de reservas
+tableManager.registerTable({
+    tableId: "tablaReservas",
+    apiEndpoint: "reserva",
+    columns: [
+        { key: "reserva_id" },
+        { key: "producto_id" },
+        { key: "nombre_usuario" },
+        { key: "dia_reserva" },
+        { key: "hora_llegada" },
+        { key: "hora_salida" },
+        { key: "cantidad_personas" },
+        { key: "monto_total" },
+        { key: "registro_fecha_reserva" }
+    ],
+    noDataMessage: "No se encontraron reservas",
+    customRowRenderer: (reserva) => `
+        <td>${reserva.reserva_id}</td>
+        <td>${reserva.producto_id}</td>
+        <td>${reserva.nombre_usuario || 'Reserva sin nombre'}</td>
+        <td>${reserva.dia_reserva || 'null'}</td>
+        <td>${reserva.hora_llegada || '00:00:00'}</td>
+        <td>${reserva.hora_salida || '00:00:00'}</td>
+        <td>${reserva.cantidad_personas}</td>
+        <td>$${parseFloat(reserva.monto_total).toFixed(2)}</td>
+        <td>${new Date(reserva.registro_fecha_reserva).toLocaleString()}</td>
+    `
+});
+
+
+//Configuración para tabla de tickets
+tableManager.registerTable({
+    tableId: "tablaTickets",
+    apiEndpoint: "ticket",
+    columns: [
+        { key: "ticket_id" },
+        { key: "reserva_id" },
+        { key: "nombre_usuario" },
+        { key: "fecha_emision" },
+        { key: "estado" }
+    ],
+    noDataMessage: "No se encontraron tickets",
+    customRowRenderer: (ticket) => `
+        <td>${ticket.ticket_id}</td>
+        <td>${ticket.reserva_id}</td>
+        <td>${ticket.nombre_usuario}</td>
+        <td>${ticket.fecha_emision}</td>
+        <td>${ticket.estado || "generado"}</td>
+    `
+});
+
+// ========================================
+// FUNCIONES SIMPLIFICADAS
+// ========================================
+// Funciones de carga ahora son wrappers simples
+async function cargarProductos(tipoFiltro = null) {
+    await tableManager.loadData("tablaProductos", tipoFiltro);
+}
+
+async function cargarEmpleados() {
+    await tableManager.loadData("tablaEmpleados");
+}
+
+async function cargarReservas() {
+    await tableManager.loadData("tablaReservas");
+}
+
+async function cargarTickets() {
+    await tableManager.loadData("tablaTickets");
+}
+
+
+// ========================================
+// CLASE PARA MANEJO DE MÉTRICAS
+// ========================================
+class MetricsManager {
+    constructor() {
+        this.endpoints = {
+            productos: "productos",
+            usuarios: "usuarios",
+            reservas: "reserva",
+            tickets: "ticket"
+        };
+        this.securityManager = new SecurityManager(); // Instancia de SecurityManager para verificar el token
+    }
+
+    async updateDashboardMetrics() {
+        try {
+            // VERIFICAR TOKEN ANTES DE CARGAR MÉTRICAS
+            if (!this.securityManager.hasValidToken()) {
+                this.securityManager.handleTokenExpired();
+                return;
+            }
+
+            const token = localStorage.getItem("token");
+
+            // Cargar todos los datos en paralelo
+            const promises = Object.entries(this.endpoints).map(async ([key, endpoint]) => {
+                try {
+                    const res = await apiClient.fetchAPI(endpoint, {
+                        method: "GET",
+                        headers: { "Authorization": `Bearer ${token}` }
+                    });
+                    return { key, data: this.extractData(res, key) };
+                } catch (error) {
+                    console.error(`Error al cargar ${key}:`, error);
+                    return { key, data: [] };
+                }
+            });
+
+            const results = await Promise.all(promises);
+
+            // Actualizar contadores
+            results.forEach(({ key, data }) => {
+                const countElement = document.getElementById(`count-${key}`);
+                if (countElement) {
+                    countElement.textContent = data.length;
+                }
+            });
+
+            // Actualizar información del usuario admin
+            const usuarios = results.find(r => r.key === 'usuarios')?.data || [];
+            if (usuarios.length > 0) {
+                const admin = usuarios[0];
+                const initialsElement = document.getElementById("initials-name");
+                const nameElement = document.getElementById("name-admin");
+
+                if (initialsElement) {
+                    initialsElement.textContent = `${admin.nombre.charAt(0)}${admin.apellido.charAt(0)}`.toUpperCase();
+                }
+                if (nameElement) {
+                    nameElement.textContent = `${admin.nombre} ${admin.apellido}`;
+                }
+            }
+
+        } catch (error) {
+            console.error("Error al cargar métricas del dashboard:", error);
+
+            // Manejar errores 401 a nivel general
+            if (error.message.includes("401") || (error.response && error.response.status === 401)) {
+                this.securityManager.handleTokenExpired();
+            }
+        }
+    }
+
+    extractData(response, dataKey) {
+        if (Array.isArray(response)) {
+            return response;
+        }
+
+        // Mapeo de claves específicas
+        const keyMap = {
+            productos: ['productos', 'data'],
+            usuarios: ['usuarios', 'data'],
+            reserva: ['reserva', 'data'],
+            tickets: ['tickets', 'data']
+        };
+
+        const possibleKeys = keyMap[dataKey] || [dataKey];
+
+        for (const key of possibleKeys) {
+            if (response[key] && Array.isArray(response[key])) {
+                return response[key];
+            }
+        }
+
+        return [];
+    }
+}
+
+// Instancia global del metrics manager
+const metricsManager = new MetricsManager();
+
+// ========================================
+// CLASE EDIT FORM MANAGER (MANTENIDA)
+// ========================================
+
 class EditFormManager {
     constructor() {
         this.configs = new Map();
@@ -117,7 +670,7 @@ class EditFormManager {
             onSuccess,
             onError,
             reloadFunction,
-            isCreate = false // Nueva propiedad para diferenciar crear vs editar
+            isCreate = false
         } = config;
 
         this.configs.set(formId, {
@@ -153,12 +706,10 @@ class EditFormManager {
         if (!config) return;
 
         const cancelButton = document.getElementById(config.cancelButtonId);
-        console.log("Buscando botón cancelar para:", formId, "→ encontrado:", cancelButton); // 🪵
         if (cancelButton) {
             cancelButton.addEventListener("click", () => {
                 this.hideEditCard(config.cardId);
                 this.currentEditingId = null;
-                // Limpiar formulario si es de creación
                 if (config.isCreate) {
                     const form = document.getElementById(formId);
                     if (form) form.reset();
@@ -169,12 +720,9 @@ class EditFormManager {
 
     initializeEventListeners() {
         document.addEventListener("click", async (e) => {
-            console.log("Click detectado en:", e.target.className); // Debug
-
             // Manejo de botones de editar/agregar
             for (const [formId, config] of this.configs) {
                 if (e.target.classList.contains(config.editButtonClass)) {
-                    console.log(`Botón encontrado para ${formId}, isCreate: ${config.isCreate}`); // Debug
                     if (config.isCreate) {
                         await this.handleCreateClick(formId);
                     } else {
@@ -184,14 +732,16 @@ class EditFormManager {
                 }
             }
 
-            // Manejo específico del botón "Agregar producto" por ID o texto
-            if (e.target.matches("#btnAgregarProducto") ||
-                e.target.closest("#btnAgregarProducto")) {
-                console.log("Botón Agregar producto clickeado"); // Debug
+            // Manejo específico de botones por ID
+            if (e.target.matches("#btnAgregarProducto") || e.target.closest("#btnAgregarProducto")) {
                 await this.handleCreateClick("formAgregarProducto");
             }
 
-            // Manejo de botones de desactivar/activar
+            if (e.target.matches("#btnAgregarEmpleado") || e.target.closest("#btnAgregarEmpleado")) {
+                await this.handleCreateClick("formAgregarEmpleado");
+            }
+
+            // Manejo de botones de activar/desactivar productos
             if (e.target.classList.contains("btn-desactivar-producto")) {
                 await this.handleToggleProducto(e.target, false);
             } else if (e.target.classList.contains("btn-activar-producto")) {
@@ -200,65 +750,24 @@ class EditFormManager {
 
             // Manejo de botón eliminar usuario
             if (e.target.classList.contains("btn-eliminar-usuario")) {
-                console.log("Elemento clickeado:", e.target); // ✅ Ver el botón real
-                const id = e.target.getAttribute("data-id");
-                const nombre = e.target.getAttribute("data-nombre");
-                console.log(`Enviando petición a: http://localhost:3000/api/v1/usuarios/${id} data-nombre=${nombre}`);
-
-                if (confirm(`¿Estás seguro que querés eliminar al usuario "${nombre}"?`)) {
-                    try {
-                        const token = localStorage.getItem("token");
-                        await apiClient.fetchAPI(`usuarios/${id}`, {
-                            method: "DELETE",
-                            headers: {
-                                "Authorization": `Bearer ${token}`
-                            }
-                        });
-
-                        console.log("Usuario eliminado correctamente");
-                        cargarEmpleados(); // Recargar tabla
-                    } catch (error) {
-                        console.error("Error al eliminar usuario:", error);
-                        alert(`Error al eliminar usuario: ${error.message}`);
-                    }
-                }
+                await this.handleDeleteUser(e.target);
             }
-
-
-            // Manejo específico del botón "Agregar empleado" por ID o texto
-            if (e.target.matches("#btnAgregarEmpleado") ||
-                e.target.closest("#btnAgregarEmpleado")) {
-                console.log("Botón Agregar empleado clickeado"); // Debug
-                await this.handleCreateClick("formAgregarEmpleado");
-            }
-
         });
     }
 
-    // Nuevo método para manejar creación
     async handleCreateClick(formId) {
-        console.log(`[handleCreateClick] Iniciando creación para ${formId}`); // Debug
         const config = this.configs.get(formId);
-        if (!config) {
-            console.error(`[handleCreateClick] No se encontró configuración para ${formId}`);
-            return;
-        }
+        if (!config) return;
 
-        // Limpiar formulario
         const form = document.getElementById(formId);
-        if (form) {
-            form.reset();
-            console.log(`[handleCreateClick] Formulario ${formId} limpiado`);
-        }
+        if (form) form.reset();
 
-        this.currentEditingId = null; // No hay ID para crear
+        this.currentEditingId = null;
         this.showEditCard(config.cardId);
 
-        // Si es el formulario de productos, cargar tipos
         if (formId === "formAgregarProducto") {
-            await cargarProductos(); // 👈 cargar opciones del select
+            await cargarProductos();
         }
-        console.log(`[handleCreateClick] Card ${config.cardId} mostrada`);
     }
 
     async handleEditClick(formId, button) {
@@ -272,72 +781,22 @@ class EditFormManager {
             const token = localStorage.getItem("token");
             const data = await apiClient.fetchAPI(`${config.apiEndpoint}/${id}`, {
                 method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
+                headers: { "Authorization": `Bearer ${token}` }
             });
-
-            console.log("[handleEditClick] Datos recibidos para edición:", data);
 
             this.populateForm(formId, data, config.fieldsMapping);
             this.showEditCard(config.cardId);
-
-
         } catch (error) {
             config.onError(`Error al cargar datos: ${error.message}`);
         }
     }
 
-    // Nuevo método para manejar activar/desactivar productos
     async handleToggleProducto(button, activar) {
         const id = button.getAttribute("data-id");
         const titulo = button.getAttribute("data-titulo");
         const accion = activar ? "activar" : "desactivar";
 
-        // Crear modal de confirmación
-        const modalId = `modalConfirmar${accion.charAt(0).toUpperCase() + accion.slice(1)}`;
-
-        // Remover modal existente si existe
-        const existingModal = document.getElementById(modalId);
-        if (existingModal) {
-            existingModal.remove();
-        }
-
-        // Crear nuevo modal
-        const modal = document.createElement('div');
-        modal.id = modalId;
-        modal.className = 'modal fade';
-        modal.innerHTML = `
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Confirmar ${accion}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>¿Está seguro de que desea ${accion} el producto <strong>"${titulo}"</strong>?</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-${activar ? 'success' : 'warning'}" id="btnConfirmar${accion.charAt(0).toUpperCase() + accion.slice(1)}">
-                            Confirmar ${accion}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        document.body.appendChild(modal);
-        
-        
-        // Mostrar modal
-        const bsModal = new bootstrap.Modal(modal);
-        bsModal.show();
-
-
-        // Configurar evento del botón confirmar
-        const btnConfirmar = modal.querySelector(`#btnConfirmar${accion.charAt(0).toUpperCase() + accion.slice(1)}`);
-        btnConfirmar.addEventListener('click', async () => {
+        if (confirm(`¿Está seguro de que desea ${accion} el producto "${titulo}"?`)) {
             try {
                 const token = localStorage.getItem("token");
                 await apiClient.fetchAPI(`productos/${id}`, {
@@ -349,38 +808,42 @@ class EditFormManager {
                     body: JSON.stringify({ activo: activar })
                 });
 
-                bsModal.hide();
-
-                // Recargar productos
                 await cargarProductos();
-
                 console.log(`Producto ${activar ? 'activado' : 'desactivado'} exitosamente`);
             } catch (error) {
                 console.error(`Error al ${accion} producto:`, error);
                 alert(`Error al ${accion} producto: ${error.message}`);
             }
-        });
+        }
+    }
 
+    async handleDeleteUser(button) {
+        const id = button.getAttribute("data-id");
+        const nombre = button.getAttribute("data-nombre");
 
-        // Limpiar modal después de cerrarlo
-        modal.addEventListener('hidden.bs.modal', () => {
-            modal.remove();
-        });
+        if (confirm(`¿Estás seguro que querés eliminar al usuario "${nombre}"?`)) {
+            try {
+                const token = localStorage.getItem("token");
+                await apiClient.fetchAPI(`usuarios/${id}`, {
+                    method: "DELETE",
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+
+                console.log("Usuario eliminado correctamente");
+                await cargarEmpleados();
+            } catch (error) {
+                console.error("Error al eliminar usuario:", error);
+                alert(`Error al eliminar usuario: ${error.message}`);
+            }
+        }
     }
 
     populateForm(formId, data, fieldsMapping) {
-        console.log("[populateForm] Estructura recibida:", data);
         let flatData = data;
 
-        if (
-            data &&
-            typeof data === "object" &&
-            !Array.isArray(data) &&
-            Object.keys(data).length === 1 &&
-            typeof Object.values(data)[0] === "object"
-        ) {
+        if (data && typeof data === "object" && !Array.isArray(data) &&
+            Object.keys(data).length === 1 && typeof Object.values(data)[0] === "object") {
             flatData = Object.values(data)[0];
-            console.log("[populateForm] Usando objeto anidado:", flatData);
         }
 
         Object.entries(fieldsMapping).forEach(([fieldId, dataKey]) => {
@@ -391,7 +854,6 @@ class EditFormManager {
                 } else {
                     field.value = flatData[dataKey] ?? "";
                 }
-                console.log(`[populateForm] Asignando a #${fieldId} el valor:`, flatData[dataKey]);
             }
         });
     }
@@ -403,25 +865,20 @@ class EditFormManager {
         const formData = new FormData(event.target);
         const formValues = Object.fromEntries(formData);
 
-
-        // Debug: Mostrar valores del formulario
-        console.log("[DEBUG] Valores del formulario:", formValues);
-
         const apiData = {};
         Object.entries(config.fieldsMapping).forEach(([htmlFieldId, apiFieldName]) => {
             const value = formValues[htmlFieldId];
             if (value !== undefined && value !== "") {
-                console.log(apiData[apiFieldName] = value);
                 apiData[apiFieldName] = value;
             }
         });
 
-        // Conversión de tipos para campos numéricos y booleanos
+        // Conversión de tipos
         if (apiData.capacidad !== undefined) apiData.capacidad = Number(apiData.capacidad);
         if (apiData.precio_hora !== undefined) apiData.precio_hora = Number(apiData.precio_hora);
         if (apiData.activo !== undefined) apiData.activo = apiData.activo === "true";
 
-        // Validación adicional para producto
+        // Validación para productos
         if (formId === "formAgregarProducto") {
             if (!apiData.tipo_producto_id || isNaN(apiData.tipo_producto_id)) {
                 alert("Debe seleccionar un tipo de producto válido");
@@ -429,14 +886,11 @@ class EditFormManager {
             }
         }
 
-        console.log("[handleFormSubmit] Datos a enviar a la API:", apiData);
-
         try {
             const token = localStorage.getItem("token");
             let response;
 
             if (config.isCreate) {
-                // Crear nuevo registro
                 response = await apiClient.fetchAPI(config.apiEndpoint, {
                     method: "POST",
                     headers: {
@@ -446,7 +900,6 @@ class EditFormManager {
                     body: JSON.stringify(apiData)
                 });
             } else {
-                // Actualizar registro existente
                 if (!this.currentEditingId) {
                     config.onError("No se encontró el ID del registro a actualizar");
                     return;
@@ -462,12 +915,9 @@ class EditFormManager {
                 });
             }
 
-            console.log("[handleFormSubmit] Respuesta de la API:", response);
-
             this.hideEditCard(config.cardId);
             this.currentEditingId = null;
 
-            // Limpiar formulario si es de creación
             if (config.isCreate) {
                 const form = document.getElementById(formId);
                 if (form) form.reset();
@@ -476,7 +926,6 @@ class EditFormManager {
             config.onSuccess();
             config.reloadFunction();
         } catch (error) {
-            console.error("[handleFormSubmit] Error completo:", error);
             config.onError(`Error al ${config.isCreate ? 'crear' : 'actualizar'}: ${error.message}`);
         }
     }
@@ -497,17 +946,14 @@ class EditFormManager {
     }
 }
 
-// Instanciar el manager
+// ========================================
+// INICIALIZACIÓN
+// ========================================
+
+// Instanciar el edit form manager
 const editFormManager = new EditFormManager();
 
-// Función helper para registrar múltiples formularios
-function registerMultipleEditForms(configs) {
-    configs.forEach(config => {
-        editFormManager.registerEditForm(config);
-    });
-}
-
-// Configuración de formularios de edición
+// Configuración de formularios (mantenida igual)
 const formsConfig = [
     {
         formId: "formEditarUsuario",
@@ -522,17 +968,12 @@ const formsConfig = [
             "editar-email": "email",
             "editar-rol": "rol_id"
         },
-        onSuccess: () => {
-            console.log("Usuario actualizado exitosamente");
-        },
+        onSuccess: () => console.log("Usuario actualizado exitosamente"),
         onError: (error) => {
             console.error("Error al actualizar usuario:", error);
             alert(`Error: ${error}`);
         },
-        reloadFunction: () => {
-            document.querySelector("#tablaEmpleados tbody").innerHTML = "";
-            cargarEmpleados();
-        }
+        reloadFunction: () => cargarEmpleados()
     },
     {
         formId: "formEditarProducto",
@@ -550,16 +991,12 @@ const formsConfig = [
             "editar-activo": "activo",
             "editar-precio": "precioxdia"
         },
-        onSuccess: () => {
-            console.log("Producto actualizado exitosamente");
-        },
+        onSuccess: () => console.log("Producto actualizado exitosamente"),
         onError: (error) => {
             console.error("Error al actualizar producto:", error);
             alert(`Error: ${error}`);
         },
-        reloadFunction: () => {
-            cargarProductos();
-        }
+        reloadFunction: () => cargarProductos()
     },
     {
         formId: "formAgregarProducto",
@@ -575,19 +1012,15 @@ const formsConfig = [
             "agregar-normas": "normas",
             "agregar-precio": "precio_hora"
         },
-        isCreate: true, // Marcar como formulario de creación
-        onSuccess: () => {
-            console.log("Producto agregado exitosamente");
-        },
+        isCreate: true,
+        onSuccess: () => console.log("Producto agregado exitosamente"),
         onError: (error) => {
             console.error("Error al agregar producto:", error);
             alert(`Error: ${error}`);
         },
-        reloadFunction: () => {
-            cargarProductos();
-        }
+        reloadFunction: () => cargarProductos()
     },
-        {
+    {
         formId: "formAgregarEmpleado",
         cardId: "cardAgregarEmpleado",
         cancelButtonId: "btnCancelarAgregarEmpleado",
@@ -601,340 +1034,50 @@ const formsConfig = [
             "agregar-contrasena": "contraseña",
             "agregar-telefono": "telefono"
         },
-        isCreate: true, // Marcar como formulario de creación
-        onSuccess: () => {
-            console.log("Producto agregado exitosamente");
-        },
+        isCreate: true,
+        onSuccess: () => console.log("Empleado agregado exitosamente"),
         onError: (error) => {
-            console.error("Error al agregar producto:", error);
+            console.error("Error al agregar empleado:", error);
             alert(`Error: ${error}`);
         },
-        reloadFunction: () => {
-            cargarEmpleados();
-        }
+        reloadFunction: () => cargarEmpleados()
     }
 ];
 
-// Registrar todos los formularios
-registerMultipleEditForms(formsConfig);
+// Registrar formularios
+formsConfig.forEach(config => {
+    editFormManager.registerEditForm(config);
+});
 
-// Cargar empleados (función original)
-async function cargarEmpleados() {
-    const tabla = document.getElementById("tablaEmpleados");
-    const tbody = tabla.querySelector("tbody");
+// ========================================
+// EVENT LISTENERS
+// ========================================
 
-    try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            window.location.href = "login-admin.html";
-            return;
-        }
+// Inicializar cuando cargue la página
+window.addEventListener('load', async function () {
+    await Promise.all([
+        cargarEmpleados(),
+        cargarProductos(),
+        cargarReservas(),
+        cargarTickets(),
+        metricsManager.updateDashboardMetrics()
+    ]);
 
-        const res = await apiClient.fetchAPI("usuarios", {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        });
-
-        console.log("Respuesta de API usuarios:", res);
-
-        const empleados = Array.isArray(res) ? res : res.usuarios;
-
-        if (!empleados || empleados.length === 0) {
-            throw new Error("No se encontraron empleados.");
-        }
-
-        tbody.innerHTML = ""; // ✅ Soluciona duplicados
-
-        empleados.forEach(emp => {
-            const fila = document.createElement("tr");
-            fila.innerHTML = `
-                <td>${emp.usuario_id}</td>
-                <td>${emp.nombre}</td>
-                <td>${emp.apellido}</td>
-                <td>${emp.email}</td>
-                <td>${emp.rol_id || "Sin rol"}</td>
-                <td>
-                    <button class="btn btn-sm btn-primary btn-editar-usuario" data-id="${emp.usuario_id}">Editar</button>
-                    <button class="btn btn-sm btn-danger btn-eliminar-usuario" data-id="${emp.usuario_id}" data-nombre="${emp.nombre}">Eliminar</button>
-                </td>
-            `;
-            tbody.appendChild(fila);
-        });
-
-        tabla.classList.remove("d-none");
-        document.querySelector("#divListadoEmpleados .spinner-border")?.remove();
-    } catch (error) {
-        console.error("Error al cargar empleados:", error.message);
-        document.querySelector("#divListadoEmpleados").innerHTML = `
-            <div class="alert alert-danger">Error al cargar empleados: ${error.message}</div>
-        `;
-    }
-}
-
-// Actualizar métricas del dashboard
-async function actualizarMetricasDashboard() {
-    try {
-        const token = localStorage.getItem("token");
-
-        if (!token) {
-            window.location.href = "login-admin.html";
-            return;
-        }
-
-        const res1 = await apiClient.fetchAPI("productos", {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        });
-
-        console.log("Respuesta de API productos:", res1);
-        const productos = Array.isArray(res1) ? res1 : res1.productos;
-
-        const res2 = await apiClient.fetchAPI("usuarios", {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        });
-
-        console.log("Respuesta de API usuarios:", res2);
-        const usuarios = Array.isArray(res2) ? res2 : res2.usuarios;
-
-        const res3 = await apiClient.fetchAPI("reserva", {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        });
-
-        console.log("Respuesta de API productos:", res3);
-        const reservas = Array.isArray(res3) ? res3 : res3.reservas;
-
-        const res4 = await apiClient.fetchAPI("ticket", {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        });
-
-        console.log("Respuesta de API productos:", res4);
-        const tickets = Array.isArray(res4) ? res4 : res4.tickets;
-
-        if (usuarios && usuarios.length > 0) {
-            document.getElementById("initials-name").textContent = `${usuarios[0].nombre.charAt(0)}${usuarios[0].apellido.charAt(0)}`.toUpperCase();
-            document.getElementById("name-admin").textContent = `${usuarios[0].nombre} ${usuarios[0].apellido}`;
-            document.getElementById("count-empleados").textContent = usuarios.length;
-        }
-
-        if (productos && productos.length > 0) {
-            document.getElementById("count-productos").textContent = productos.length;
-        }
-
-        if (reservas && reservas.length > 0) {
-            document.getElementById("count-reservas").textContent = reservas.length;
-        }
-
-        if (tickets && tickets.length > 0) {
-            document.getElementById("count-tickets").textContent = tickets.length;
-        }
-
-
-    } catch (error) {
-        console.error("Error al cargar métricas del dashboard:", error.message);
-
-        if (error.message.includes("401") || (error.response && error.response.status === 401)) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('userRole');
-            window.location.href = "login-admin.html";
-        }
-    }
-}
-
-// Inicializar todo al cargar la página
-window.addEventListener('load', function () {
-    cargarEmpleados();
-    cargarProductos();
-    cargarReservas();
-    cargarTickets();
-    actualizarMetricasDashboard();
-
-    // Configuración adicional para el botón agregar producto
     setupAgregarProductoButton();
 });
 
-// Función para asegurar que el botón "Agregar producto" funcione
-function setupAgregarProductoButton() {
-    // Buscar el botón por diferentes métodos
-    const btnAgregar = document.getElementById("btnAgregarProducto")
-
-    if (btnAgregar) {
-        console.log("Botón 'Agregar producto' encontrado:", btnAgregar);
-
-        // Remover listeners previos para evitar duplicados
-        btnAgregar.removeEventListener("click", handleAgregarProductoClick);
-
-        // Agregar listener específico
-        btnAgregar.addEventListener("click", handleAgregarProductoClick);
-
-        // También agregar la clase esperada por el EditFormManager
-        btnAgregar.classList.add("btnAgregarProducto");
-    } else {
-        console.warn("No se encontró el botón 'Agregar producto'. Verifica que tenga id='btnAgregarProducto'");
-    }
-}
-
-// Función específica para manejar el click del botón agregar
-function handleAgregarProductoClick(e) {
-    console.log("Botón 'Agregar producto' clickeado");
+// Logout
+document.getElementById('logout-btn')?.addEventListener('click', function (e) {
     e.preventDefault();
-    e.stopPropagation();
-
-    // Llamar directamente al método del EditFormManager
-    editFormManager.handleCreateClick("formAgregarProducto");
-}
-
-
-// Cargar empleados (función original)
-// Función mejorada para cargar reservas
-async function cargarReservas() {
-    const tabla = document.getElementById("tablaReservas");
-    const tbody = tabla.querySelector("tbody");
-    try {
-        const token = localStorage.getItem("token");
-        
-        if (!token) {
-            window.location.href = "login-admin.html";
-            return;
-        }
-
-        const res = await apiClient.fetchAPI("reserva", {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        });
-
-        console.log("Respuesta de API reservas:", res);
-
-        const reservas = Array.isArray(res) ? res : res.usuarios || [];
-
-        tbody.innerHTML = ""; // Limpiar tabla
-
-        if (reservas.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="9" class="text-center py-4 text-muted">
-                        No se encontraron reservas
-                    </td>
-                </tr>
-            `;
-        } else {
-            reservas.forEach(reser => {
-                const fila = document.createElement("tr");
-                fila.innerHTML = `
-                    <td>${reser.reserva_id}</td>
-                    <td>${reser.producto_id}</td>
-                    <td>${reser.nombre_usuario || 'Reserva sin nombre'}</td>
-                    <td>${reser.dia_reserva || 'null'}</td>
-                    <td>${reser.hora_llegada || '00:00:00'}</td>
-                    <td>${reser.hora_salida || '00:00:00'}</td>
-                    <td>${reser.cantidad_personas}</td>
-                    <td>$${parseFloat(reser.monto_total).toFixed(2)}</td>
-                    <td>${new Date(reser.registro_fecha_reserva).toLocaleString()}</td>
-                `;
-                tbody.appendChild(fila);
-            });
-        }
-
-        tabla.classList.remove("d-none");
-        const spinner = document.querySelector("#divListadoReservas .spinner-border");
-        if (spinner) spinner.remove();
-        
-    } catch (error) {
-        console.error("Error al cargar reservas:", error.message);
-        document.querySelector("#divListadoReservas").innerHTML = `
-            <div class="alert alert-danger">Error al cargar reservas: ${error.message}</div>
-        `;
-    }
-}
-
-
-async function cargarTickets() {
-    const tabla = document.getElementById("tablaTickets");
-    const tbody = tabla.querySelector("tbody");
-    try {
-        const token = localStorage.getItem("token");
-        
-        if (!token) {
-            window.location.href = "login-admin.html";
-            return;
-        }
-
-        const res = await apiClient.fetchAPI("ticket", {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        });
-
-        console.log("Respuesta de API tickets:", res);
-
-        const tickets = Array.isArray(res) ? res : res.tickets || [];
-
-        tbody.innerHTML = ""; // Limpiar tabla
-
-        if (tickets.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="9" class="text-center py-4 text-muted">
-                        No se encontraron ticket
-                    </td>
-                </tr>
-            `;
-        } else {
-            tickets.forEach(tckt => {
-                const fila = document.createElement("tr");
-                fila.innerHTML = `
-                    <td>${tckt.ticket_id}</td>
-                    <td>${tckt.reserva_id}</td>
-                    <td>${tckt.nombre_usuario}</td>
-                    <td>${tckt.fecha_emision}</td>
-                    <td>${tckt.estado || "generado"}</td>
-                `;
-                tbody.appendChild(fila);
-            });
-        }
-
-        tabla.classList.remove("d-none");
-        const spinner = document.querySelector("#divListadoTickets .spinner-border");
-        if (spinner) spinner.remove();
-        
-    } catch (error) {
-        console.error("Error al cargar reservas:", error.message);
-        document.querySelector("#divListadoReservas").innerHTML = `
-            <div class="alert alert-danger">Error al cargar reservas: ${error.message}</div>
-        `;
-    }
-}
-
-document.getElementById('logout-btn').addEventListener('click', function(e) {
-    e.preventDefault();
-    
-    // Limpiar localStorage
     localStorage.clear();
-    
-    // Redirigir a login
     window.location.href = 'login-admin.html';
 });
 
-// Configurar listeners para filtrado
+// Filtros para productos
 document.getElementById('btnFiltrarTipo')?.addEventListener('click', async () => {
     const tipo = document.getElementById('inputFiltrarTipo').value;
     if (tipo && !isNaN(tipo)) {
-        await cargarProductos(parseInt(tipo)); // Filtrado local
+        await cargarProductos(parseInt(tipo));
     } else {
         alert("Por favor ingrese un número válido para el tipo de producto");
     }
@@ -942,6 +1085,25 @@ document.getElementById('btnFiltrarTipo')?.addEventListener('click', async () =>
 
 document.getElementById('btnResetFiltro')?.addEventListener('click', async () => {
     document.getElementById('inputFiltrarTipo').value = '';
-    await cargarProductos(); // Mostrar todos sin filtrar
+    await cargarProductos();
 });
+
+// ========================================
+// FUNCIONES AUXILIARES
+// ========================================
+
+function setupAgregarProductoButton() {
+    const btnAgregar = document.getElementById("btnAgregarProducto");
+    if (btnAgregar) {
+        // El botón ya está manejado por el EditFormManager
+        // Solo necesitamos asegurar que esté visible y funcional
+        btnAgregar.style.display = "block";
+
+        // Agregar evento click si no existe (redundancia preventiva)
+        btnAgregar.addEventListener("click", async function () {
+            await editFormManager.handleCreateClick("formAgregarProducto");
+        });
+    }
+}
+
 
